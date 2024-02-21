@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,9 +13,6 @@ import dto.Ingredient;
 
 public class IngredientDAODatabase implements DAOIngredient {
 
-    private static final String url = "jdbc:postgresql://psqlserv:5432/but2";
-    private static final String nom = "samyvancalsteretu";
-    private static final String mdp = "moi";
     private Connection con;
 
     public Ingredient findById(int id) {
@@ -37,10 +35,14 @@ public class IngredientDAODatabase implements DAOIngredient {
 
     public IngredientDAODatabase() {
         try {
-            con = DriverManager.getConnection(url, nom, mdp);
+            con = DS.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("sql error");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Jar non trouvé : " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("file not found : " + e.getMessage());
         }
     }
 
