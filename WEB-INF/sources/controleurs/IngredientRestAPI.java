@@ -26,10 +26,8 @@ public class IngredientRestAPI extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        List<Ingredient> ingredients = ingredientDAO.findAll();
-
         objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(ingredients);
+        String json;
         
         String stringId = extractIdFromURI(req.getPathInfo());
 
@@ -43,6 +41,9 @@ public class IngredientRestAPI extends HttpServlet {
             } catch (Exception e) {
                 json = objectMapper.writeValueAsString(404);
             }
+        } else {
+            List<Ingredient> ingredients = ingredientDAO.findAll();
+            json = objectMapper.writeValueAsString(ingredients);
         }
         
         res.setContentType("application/json");
