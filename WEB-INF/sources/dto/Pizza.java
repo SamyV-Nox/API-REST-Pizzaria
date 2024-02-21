@@ -7,7 +7,8 @@ import java.util.List;
  */
 public class Pizza {
     
-    private final String NAME;
+    private final int ID;
+    private String name;
     private String pate;
     private double prixBase;
     private List<Ingredient> ingredients;
@@ -20,11 +21,22 @@ public class Pizza {
      * @param prixBase   Le prix de base de la pizza.
      * @param ingredients La liste des ingrédients de la pizza.
      */
-    public Pizza(String nAME, String pate, double prixBase, List<Ingredient> ingredients) {
-        NAME = nAME;
+    public Pizza(int ID, String name, String pate, double prixBase, List<Ingredient> ingredients) {
+        this.ID = ID;
+        this.name = name;
         this.pate = pate;
         this.prixBase = prixBase;
         this.ingredients = ingredients;
+    }
+
+
+    /**
+     * Retourne l'ID de la pizza.
+     *
+     * @return L'ID de la pizza.
+     */
+    public int getID() {
+        return ID;
     }
 
     /**
@@ -32,8 +44,8 @@ public class Pizza {
      *
      * @return Le nom de la pizza.
      */
-    public String getNAME() {
-        return NAME;
+    public String getName() {
+        return name;
     }
 
     /**
@@ -61,6 +73,16 @@ public class Pizza {
      */
     public List<Ingredient> getIngredients() {
         return ingredients;
+    }
+
+
+    /**
+     * Modifie le nom de la pizza.
+     *
+     * @param name Le nouveau nom de la pizza.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

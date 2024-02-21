@@ -8,7 +8,6 @@ public interface DAOIngredient {
 
     public List<Ingredient> findAll();
 
-
     public Ingredient findById(int id);
 
     public void save(Ingredient ingredient);
