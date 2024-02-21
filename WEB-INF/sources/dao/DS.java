@@ -1,6 +1,5 @@
 package dao;
 
-import javax.imageio.IIOException;
 import java.io.*;
 import java.sql.*;
 import java.util.Properties;
