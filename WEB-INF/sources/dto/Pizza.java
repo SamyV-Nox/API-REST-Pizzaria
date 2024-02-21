@@ -15,8 +15,9 @@ public class Pizza {
 
     /**
      * Constructeur de la classe Pizza.
-     *
-     * @param nAME       Le nom de la pizza.
+     *  
+     * @param ID         L'ID de la pizza.
+     * @param name       Le nom de la pizza.
      * @param pate       Le type de pâte de la pizza.
      * @param prixBase   Le prix de base de la pizza.
      * @param ingredients La liste des ingrédients de la pizza.

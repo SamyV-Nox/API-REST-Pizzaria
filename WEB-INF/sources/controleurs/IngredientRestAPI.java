@@ -3,6 +3,7 @@ package controleurs;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dao.DAOIngredient;
@@ -26,29 +27,45 @@ public class IngredientRestAPI extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        objectMapper = new ObjectMapper();
-        String json;
-        
+
         String stringId = extractIdFromURI(req.getPathInfo());
+        String json;
 
         if (stringId != null) {
-            try {
-                int id = Integer.parseInt(stringId);
-                json = objectMapper.writeValueAsString(ingredientDAO.findById(id));
-                if (json == null) {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                }
-            } catch (Exception e) {
-                json = objectMapper.writeValueAsString(404);
-            }
+            json = getJsonIngredientByID(stringId, res);
         } else {
-            List<Ingredient> ingredients = ingredientDAO.findAll();
-            json = objectMapper.writeValueAsString(ingredients);
+            json = getJsonAllIngredient(res);
         }
-        
+
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(json);
+    }
+
+    private String getJsonAllIngredient(HttpServletResponse res) throws IOException {
+        try {
+            List<Ingredient> ingredients = ingredientDAO.findAll();
+            return objectMapper.writeValueAsString(ingredients);
+        } catch (JsonProcessingException e) {
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
+    private String getJsonIngredientByID(String stringId, HttpServletResponse res) {
+        String jsonIngredient = null;
+        try {
+            int id = Integer.parseInt(stringId);
+            Ingredient ingredient = ingredientDAO.findById(id);
+            if (ingredient != null) {
+                jsonIngredient = objectMapper.writeValueAsString(ingredient);
+            } else {
+                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            jsonIngredient = null;
+        }
+        return jsonIngredient;
     }
 
     @Override
