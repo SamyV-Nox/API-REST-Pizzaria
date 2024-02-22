@@ -28,6 +28,7 @@ public interface DAOPizza {
      * Enregistre une nouvelle pizza.
      *
      * @param pizza La pizza à enregistrer.
+     * @return
      */
-    public void save(Pizza pizza);
+    public boolean save(Pizza pizza);
 }
