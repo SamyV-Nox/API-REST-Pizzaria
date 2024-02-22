@@ -56,6 +56,7 @@ public class IngredientRestAPI extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
+        System.out.println("ok");
         if (pathInfo != null && pathInfo.equals("/")) {
             addIngredient(req, res);
         } else {

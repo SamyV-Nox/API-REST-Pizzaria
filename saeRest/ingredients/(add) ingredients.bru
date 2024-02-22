@@ -1,0 +1,19 @@
+meta {
+  name: (add) ingredients
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/sae4-back-end/ingredients/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id":5,
+    "name":"chocolat",
+    "price":1
+  }
+}
