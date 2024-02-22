@@ -16,9 +16,9 @@ CREATE TABLE pizza(
 CREATE TABLE contient(
     idPizza int,
     idIngredient int,
-    constaint fk_pizza foreign key(idPizza) references pizza(id),
-    constaint fk_ingredient foreign key(idIngredient) references ingredients(id)
-)
+    constraint fk_pizza foreign key(idPizza) references pizza(id),
+    constraint fk_ingredient foreign key(idIngredient) references ingredients(id)
+);
 
 INSERT INTO ingredients (name, price) values
     ('sauce tomate', 3),
