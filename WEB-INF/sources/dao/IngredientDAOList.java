@@ -27,7 +27,12 @@ public class IngredientDAOList implements DAOIngredient {
         return null;
     }
 
-    public void save(Ingredient ingredient) {
-        ingredients.add(ingredient);
+    public boolean save(Ingredient ingredient) {
+        return ingredients.add(ingredient);
+    }
+
+    @Override
+    public boolean delete(Ingredient ingredient) {
+        return ingredients.remove(ingredient);
     }
 }

@@ -45,15 +45,17 @@ public class IngredientDAODatabase implements DAOIngredient {
         }
     }
 
-    public void save(Ingredient joueur) {
+    public boolean save(Ingredient joueur) {
         String query = "insert into ingredients values (?, '?')";
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, joueur.getId());
             ps.setString(2, joueur.getName());
             ps.execute();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class IngredientDAODatabase implements DAOIngredient {
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 ingredients.add(new Ingredient(id, name));
@@ -73,5 +75,26 @@ public class IngredientDAODatabase implements DAOIngredient {
         }
 
         return ingredients;
+    }
+/* 
+    @Override
+    public boolean delete(Ingredient ingredient) {
+        String query = "insert into ingredients values (?, '?')";
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, joueur.getId());
+            ps.setString(2, joueur.getName());
+            ps.execute();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    */
+
+    @Override
+    public boolean delete(Ingredient ingredient) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 }

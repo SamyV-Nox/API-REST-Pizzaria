@@ -30,6 +30,12 @@ public interface DAOIngredient {
      *
      * @param ingredient L'ingrédient à enregistrer.
      */
-    public void save(Ingredient ingredient);
+    public boolean save(Ingredient ingredient);
     
+    /**
+     * Supprime un nouvel ingrédient.
+     *
+     * @param ingredient L'ingrédient à supprimer.
+     */
+    public boolean delete(Ingredient ingredient);
 }

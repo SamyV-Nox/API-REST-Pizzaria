@@ -27,71 +27,103 @@ public class IngredientRestAPI extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String stringId = extractIdFromURI(req.getPathInfo());
-        String json;
-
-        if (stringId != null) {
-            json = getJsonIngredientByID(stringId, res);
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            getAllIngredients(req, res);
         } else {
-            json = getJsonAllIngredients(res);
-        }
-
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(json);
-    }
-
-    private String getJsonAllIngredients(HttpServletResponse res) throws IOException {
-        try {
-            List<Ingredient> ingredients = ingredientDAO.findAll();
-            return objectMapper.writeValueAsString(ingredients);
-        } catch (JsonProcessingException e) {
-            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        return null;
-    }
-
-    private String getJsonIngredientByID(String stringId, HttpServletResponse res) throws IOException {
-        try {
-            int id = Integer.parseInt(stringId);
-            Ingredient ingredient = ingredientDAO.findById(id);
-            if (ingredient != null) {
-                return objectMapper.writeValueAsString(ingredient);
+            String[] pathParts = pathInfo.split("/");
+            if (pathParts.length == 2) {
+                int id;
+                try {
+                    id = Integer.parseInt(pathParts[1]);
+                } catch (NumberFormatException e) {
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+                if (pathParts[1].equals("name")) {
+                    getIngredientName(id, res);
+                } else {
+                    getIngredientById(id, res);
+                }
             } else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
-        } catch (NumberFormatException e) {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-        return null;
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String requestURI = req.getRequestURI();
-        if (requestURI.equals("/ingredients")) {
-            String requestBody = req.getReader().lines().reduce("", String::concat);
-            Ingredient ingredient = objectMapper.readValue(requestBody, Ingredient.class);
-            Ingredient existingIngredient = ingredientDAO.findById(ingredient.getId());
-            if (existingIngredient != null) {
-                res.getWriter().write("0");
-                res.setStatus(HttpServletResponse.SC_CONFLICT);
-            } else {
-                ingredientDAO.save(ingredient);
-                res.getWriter().write("1");
-                res.setStatus(HttpServletResponse.SC_CREATED);
-            }
+    private void getAllIngredients(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        try {
+            List<Ingredient> ingredients = ingredientDAO.findAll();
+            res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
+            res.getWriter().write(objectMapper.writeValueAsString(ingredients));
+        } catch (JsonProcessingException e) {
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void getIngredientById(int id, HttpServletResponse res) throws IOException {
+        Ingredient ingredient = ingredientDAO.findById(id);
+        if (ingredient != null) {
+            res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
+            res.getWriter().write(objectMapper.writeValueAsString(ingredient));
         } else {
-            res.getWriter().write("404");
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private String extractIdFromURI(String uri) {
-        if (uri != null) {
-            String[] parts = uri.split("/");
-            return parts[parts.length - 1];
+    private void getIngredientName(int id, HttpServletResponse res) throws IOException {
+        Ingredient ingredient = ingredientDAO.findById(id);
+        if (ingredient != null) {
+            res.setContentType("text/plain");
+            res.setCharacterEncoding("UTF-8");
+            res.getWriter().write(ingredient.getName());
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
-        return null;
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.equals("/")) {
+            addIngredient(req, res);
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void addIngredient(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        String requestBody = req.getReader().lines().reduce("", String::concat);
+        Ingredient ingredient = objectMapper.readValue(requestBody, Ingredient.class);
+        Ingredient existingIngredient = ingredientDAO.findById(ingredient.getId());
+        if (existingIngredient != null) {
+            res.setStatus(HttpServletResponse.SC_CONFLICT);
+        } else {
+            ingredientDAO.save(ingredient);
+            res.setStatus(HttpServletResponse.SC_CREATED);
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.matches("^/\\d+$")) {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            deleteIngredient(id, res);
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void deleteIngredient(int id, HttpServletResponse res) throws IOException {
+        Ingredient ingredient = ingredientDAO.findById(id);
+        if (ingredient != null) {
+            ingredientDAO.delete(ingredient);
+            res.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 }
