@@ -27,14 +27,13 @@ public class IngredientRestAPI extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-
         String stringId = extractIdFromURI(req.getPathInfo());
         String json;
 
         if (stringId != null) {
             json = getJsonIngredientByID(stringId, res);
         } else {
-            json = getJsonAllIngredient(res);
+            json = getJsonAllIngredients(res);
         }
 
         res.setContentType("application/json");
@@ -42,7 +41,7 @@ public class IngredientRestAPI extends HttpServlet {
         res.getWriter().write(json);
     }
 
-    private String getJsonAllIngredient(HttpServletResponse res) throws IOException {
+    private String getJsonAllIngredients(HttpServletResponse res) throws IOException {
         try {
             List<Ingredient> ingredients = ingredientDAO.findAll();
             return objectMapper.writeValueAsString(ingredients);
@@ -52,39 +51,38 @@ public class IngredientRestAPI extends HttpServlet {
         return null;
     }
 
-    private String getJsonIngredientByID(String stringId, HttpServletResponse res) {
-        String jsonIngredient = null;
+    private String getJsonIngredientByID(String stringId, HttpServletResponse res) throws IOException {
         try {
             int id = Integer.parseInt(stringId);
             Ingredient ingredient = ingredientDAO.findById(id);
             if (ingredient != null) {
-                jsonIngredient = objectMapper.writeValueAsString(ingredient);
+                return objectMapper.writeValueAsString(ingredient);
             } else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
-        } catch (Exception e) {
-            jsonIngredient = null;
+        } catch (NumberFormatException e) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-        return jsonIngredient;
+        return null;
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (requestURI.equals("/ingredients")) {
-            String requestBody = req.getReader().lines().reduce("", (accumulator, actual) -> accumulator + actual);
+            String requestBody = req.getReader().lines().reduce("", String::concat);
             Ingredient ingredient = objectMapper.readValue(requestBody, Ingredient.class);
             Ingredient existingIngredient = ingredientDAO.findById(ingredient.getId());
             if (existingIngredient != null) {
-                res.getWriter().write(0);
+                res.getWriter().write("0");
                 res.setStatus(HttpServletResponse.SC_CONFLICT);
             } else {
                 ingredientDAO.save(ingredient);
-                res.getWriter().write(1);
+                res.getWriter().write("1");
                 res.setStatus(HttpServletResponse.SC_CREATED);
             }
         } else {
-            res.getWriter().write(404);
+            res.getWriter().write("404");
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
