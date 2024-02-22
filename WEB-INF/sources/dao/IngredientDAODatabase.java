@@ -76,25 +76,17 @@ public class IngredientDAODatabase implements DAOIngredient {
 
         return ingredients;
     }
-/* 
-    @Override
-    public boolean delete(Ingredient ingredient) {
-        String query = "insert into ingredients values (?, '?')";
-        try (PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setInt(1, joueur.getId());
-            ps.setString(2, joueur.getName());
-            ps.execute();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    */
 
     @Override
-    public boolean delete(Ingredient ingredient) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+public boolean delete(Ingredient ingredient) {
+    String query = "DELETE FROM ingredients WHERE id = ?";
+    try (PreparedStatement ps = con.prepareStatement(query)) {
+        ps.setInt(1, ingredient.getId());
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return false;
+}
 }

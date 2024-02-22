@@ -32,7 +32,8 @@ public class IngredientRestAPI extends HttpServlet {
             getAllIngredients(req, res);
         } else {
             String[] pathParts = pathInfo.split("/");
-            if (pathParts.length == 2) {
+            System.out.println(pathInfo + " " + pathParts[1]);
+            if (pathParts.length > 0 ) {
                 int id;
                 try {
                     id = Integer.parseInt(pathParts[1]);
@@ -40,14 +41,36 @@ public class IngredientRestAPI extends HttpServlet {
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-                if (pathParts[1].equals("name")) {
+                if (pathParts.length == 3 && pathParts[2].equals("name")) {
                     getIngredientName(id, res);
                 } else {
                     getIngredientById(id, res);
                 }
+                
             } else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
+        }
+    }
+
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.equals("/")) {
+            addIngredient(req, res);
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && isValidIngredientId(pathInfo)) {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            deleteIngredient(id, res);
+        } else {
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -84,16 +107,6 @@ public class IngredientRestAPI extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.equals("/")) {
-            addIngredient(req, res);
-        } else {
-            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
     private void addIngredient(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String requestBody = req.getReader().lines().reduce("", String::concat);
         Ingredient ingredient = objectMapper.readValue(requestBody, Ingredient.class);
@@ -106,17 +119,6 @@ public class IngredientRestAPI extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.matches("^/\\d+$")) {
-            int id = Integer.parseInt(pathInfo.substring(1));
-            deleteIngredient(id, res);
-        } else {
-            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
     private void deleteIngredient(int id, HttpServletResponse res) throws IOException {
         Ingredient ingredient = ingredientDAO.findById(id);
         if (ingredient != null) {
@@ -124,6 +126,16 @@ public class IngredientRestAPI extends HttpServlet {
             res.setStatus(HttpServletResponse.SC_OK);
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private boolean isValidIngredientId(String pathInfo) {
+        String idString = pathInfo.substring(1);
+        try {
+            int id = Integer.parseInt(idString);
+            return id >= 0; 
+        } catch (NumberFormatException e) {
+            return false; 
         }
     }
 }
