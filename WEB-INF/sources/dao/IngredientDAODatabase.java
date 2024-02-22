@@ -45,11 +45,12 @@ public class IngredientDAODatabase implements DAOIngredient {
         }
     }
 
-    public boolean save(Ingredient joueur) {
-        String query = "insert into ingredients values (?, '?')";
+    public boolean save(Ingredient ingredient) {
+        String query = "INSERT INTO ingredients VALUES ( ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setInt(1, joueur.getId());
-            ps.setString(2, joueur.getName());
+            ps.setInt(1, ingredient.getId());
+            ps.setString(2, ingredient.getName());
+            ps.setInt(3, ingredient.getPrice());
             ps.execute();
             return true;
         } catch (SQLException e) {
@@ -78,15 +79,15 @@ public class IngredientDAODatabase implements DAOIngredient {
     }
 
     @Override
-public boolean delete(Ingredient ingredient) {
-    String query = "DELETE FROM ingredients WHERE id = ?";
-    try (PreparedStatement ps = con.prepareStatement(query)) {
-        ps.setInt(1, ingredient.getId());
-        int rowsAffected = ps.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+    public boolean delete(Ingredient ingredient) {
+        String query = "DELETE FROM ingredients WHERE id = ?";
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, ingredient.getId());
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
 }
