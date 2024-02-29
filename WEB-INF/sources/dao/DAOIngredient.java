@@ -1,7 +1,6 @@
 package dao;
 
-import java.util.List;
-
+import java.util.Collection;
 import dto.Ingredient;
 
 /**
@@ -15,7 +14,7 @@ public interface DAOIngredient {
      *
      * @return Une liste contenant tous les ingrédients.
      */
-    public List<Ingredient> findAll();
+    public Collection<Ingredient> findAll();
 
     /**
      * Récupère un ingrédient par son identifiant.

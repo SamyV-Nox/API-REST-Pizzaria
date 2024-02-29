@@ -1,23 +1,23 @@
-DROP TABLE IF EXISTS ingredients, pizza, contient;
+DROP TABLE IF EXISTS ingredients, pizzas, contient;
 
 CREATE TABLE ingredients(
-    id Serial primary key,
+    ino Serial primary key,
     name varchar(20),
     price Integer 
 );
 
-CREATE TABLE pizza(
-    id Serial primary key,
+CREATE TABLE pizzas (
+    pno Serial primary key,
     name varchar(20),
-    pate varchar(20),
+    dough varchar(20),
     price Float
 );
 
 CREATE TABLE contient(
-    idPizza int,
-    idIngredient int,
-    constraint fk_pizza foreign key(idPizza) references pizza(id),
-    constraint fk_ingredient foreign key(idIngredient) references ingredients(id)
+    pno int,
+    ino int,
+    constraint fk_pizza foreign key(pno) references pizzas(pno),
+    constraint fk_ingredient foreign key(ino) references ingredients(ino)
 );
 
 INSERT INTO ingredients (name, price) values
@@ -34,7 +34,7 @@ INSERT INTO ingredients (name, price) values
     ('parmesan', 3),
     ('noix de Grenoble', 1);
 
-INSERT INTO pizza (name, pate, price) values
+INSERT INTO pizzas (name, dough, price) values
     ('jambon fromage', 'épaisse', 3),
     ('tartiflette', 'fine', 2),
     ('raviole', 'épaisse', 3),

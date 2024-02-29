@@ -1,33 +1,65 @@
 package dto;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Représente une pizza.
  */
 public class Pizza {
     
-    private final int ID;
+    @JsonProperty("id")
+    private int id;
+
+    @JsonProperty("name")
     private String name;
-    private String pate;
-    private double prixBase;
+
+    @JsonProperty("dough")
+    private String dough;
+
+    @JsonProperty("price")
+    private double price;
+
+    @JsonProperty("ingredients")
     private List<Ingredient> ingredients;
 
     /**
      * Constructeur de la classe Pizza.
      *  
-     * @param ID         L'ID de la pizza.
-     * @param name       Le nom de la pizza.
-     * @param pate       Le type de pâte de la pizza.
-     * @param prixBase   Le prix de base de la pizza.
+     * @param id          L'ID de la pizza.
+     * @param name        Le nom de la pizza.
+     * @param dough       Le type de pâte de la pizza.
+     * @param price       Le prix de base de la pizza.
      * @param ingredients La liste des ingrédients de la pizza.
      */
-    public Pizza(int ID, String name, String pate, double prixBase, List<Ingredient> ingredients) {
-        this.ID = ID;
+    public Pizza(int id, String name, String dough, double price, List<Ingredient> ingredients) {
+        this.id = id;
         this.name = name;
-        this.pate = pate;
-        this.prixBase = prixBase;
+        this.dough = dough;
+        this.price = price;
         this.ingredients = ingredients;
+    }
+
+    /**
+     * Constructeur de la classe Pizza.
+     * Avec une liste vide d'Ingredients
+     *  
+     * @param id          L'ID de la pizza.
+     * @param name        Le nom de la pizza.
+     * @param dough       Le type de pâte de la pizza.
+     * @param price       Le prix de base de la pizza.
+     */
+    public Pizza(int id, String name, String dough, double price) {
+        this(id, name, dough, price, new ArrayList<>());
+    }
+
+    /**
+     * Constructeur par défaut de la classe Pizza.
+     * Ce constructeur est requis pour la désérialisation JSON.
+     */
+    public Pizza() {
     }
 
 
@@ -36,8 +68,8 @@ public class Pizza {
      *
      * @return L'ID de la pizza.
      */
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
     /**
@@ -54,8 +86,8 @@ public class Pizza {
      *
      * @return Le type de pâte de la pizza.
      */
-    public String getPate() {
-        return pate;
+    public String getDough() {
+        return dough;
     }
 
     /**
@@ -63,8 +95,21 @@ public class Pizza {
      *
      * @return Le prix de base de la pizza.
      */
-    public double getPrixBase() {
-        return prixBase;
+    public double getPrice() {
+        return price;
+    }
+
+    /**
+     * Retourne le prix final de la pizza.
+     *
+     * @return Le prix final de la pizza.
+     */
+    public double getFinalPrice() {
+        double price = getPrice();
+        for (Ingredient ingredient : ingredients) {
+            price += ingredient.getPrice();
+        }
+        return price;
     }
 
     /**
@@ -89,19 +134,19 @@ public class Pizza {
     /**
      * Modifie le type de pâte de la pizza.
      *
-     * @param pate Le nouveau type de pâte de la pizza.
+     * @param dough Le nouveau type de pâte de la pizza.
      */
-    public void setPate(String pate) {
-        this.pate = pate;
+    public void setDough(String dough) {
+        this.dough = dough;
     }
 
     /**
      * Modifie le prix de base de la pizza.
      *
-     * @param prixBase Le nouveau prix de base de la pizza.
+     * @param price Le nouveau prix de base de la pizza.
      */
-    public void setPrixBase(double prixBase) {
-        this.prixBase = prixBase;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     /**
@@ -111,5 +156,33 @@ public class Pizza {
      */
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Pizza other = (Pizza) obj;
+        if (id != other.id)
+            return false;
+        return true;
+    }    
+
+    @Override
+    public String toString() {
+        return "{id" + id + ",name=" + name + ",dough=" + dough + ",price=" + price + ",ingredients="
+                + ingredients + "}\n";
     }    
 }

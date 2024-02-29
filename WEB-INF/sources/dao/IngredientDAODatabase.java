@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import dto.Ingredient;
 
@@ -14,16 +14,16 @@ public class IngredientDAODatabase implements DAOIngredient {
 
     private Connection con;
 
-    public Ingredient findById(int id) {
+    public Ingredient findById(int pno) {
         Ingredient ingredient = null;
-        String query = "SELECT * FROM ingredients WHERE id = ?";
+        String query = "SELECT * FROM ingredients WHERE ino = ?";
         try (PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setInt(1, id);
+            ps.setInt(1, pno);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 String name = rs.getString("name");
-                ingredient = new Ingredient(id, name);
+                ingredient = new Ingredient(pno, name);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,16 +60,16 @@ public class IngredientDAODatabase implements DAOIngredient {
     }
 
     @Override
-    public List<Ingredient> findAll() {
-        List<Ingredient> ingredients = new ArrayList<>();
+    public Collection<Ingredient> findAll() {
+        Collection<Ingredient> ingredients = new ArrayList<>();
         String query = "SELECT * FROM ingredients";
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int ino = rs.getInt("ino");
                 String name = rs.getString("name");
-                ingredients.add(new Ingredient(id, name));
+                ingredients.add(new Ingredient(ino, name));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,7 +80,7 @@ public class IngredientDAODatabase implements DAOIngredient {
 
     @Override
     public boolean delete(Ingredient ingredient) {
-        String query = "DELETE FROM ingredients WHERE id = ?";
+        String query = "DELETE FROM ingredients WHERE ino = ?";
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, ingredient.getId());
             int rowsAffected = ps.executeUpdate();

@@ -1,7 +1,7 @@
 package controleurs;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,7 +67,7 @@ public class IngredientRestAPI extends HttpServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-        if (pathInfo != null && isValidIngredientId(pathInfo)) {
+        if (pathInfo != null && isValidId(pathInfo)) {
             int id = Integer.parseInt(pathInfo.substring(1));
             deleteIngredient(id, res);
         } else {
@@ -77,7 +77,7 @@ public class IngredientRestAPI extends HttpServlet {
 
     private void getAllIngredients(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
-            List<Ingredient> ingredients = ingredientDAO.findAll();
+            Collection<Ingredient> ingredients = ingredientDAO.findAll();
             res.setContentType("application/json");
             res.setCharacterEncoding("UTF-8");
             res.getWriter().write(objectMapper.writeValueAsString(ingredients));
@@ -130,7 +130,7 @@ public class IngredientRestAPI extends HttpServlet {
         }
     }
 
-    private boolean isValidIngredientId(String pathInfo) {
+    private boolean isValidId(String pathInfo) {
         String idString = pathInfo.substring(1);
         try {
             int id = Integer.parseInt(idString);

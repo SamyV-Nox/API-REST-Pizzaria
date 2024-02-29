@@ -1,6 +1,6 @@
 package dao;
 
-import java.util.List;
+import java.util.Collection;
 import dto.Pizza;
 
 /**
@@ -14,7 +14,7 @@ public interface DAOPizza {
      *
      * @return Une liste contenant toutes les pizzas.
      */
-    public List<Pizza> findAll();
+    public Collection<Pizza> findAll();
 
     /**
      * Récupère une pizza par son identifiant.
@@ -28,7 +28,14 @@ public interface DAOPizza {
      * Enregistre une nouvelle pizza.
      *
      * @param pizza La pizza à enregistrer.
-     * @return
+     * @return La validation de l'enregistrement.
      */
     public boolean save(Pizza pizza);
+
+    /**
+     * Supprime une pizza.
+     *
+     * @param ingredient La pizza à supprimer.
+     */
+    public boolean delete(Pizza pizza);
 }
