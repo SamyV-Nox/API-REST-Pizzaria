@@ -32,7 +32,7 @@ public class PizzaDAODatabase implements DAOPizza {
 
     public Pizza findById(int pno) {
         Pizza pizza = null;
-        String query = "SELECT i.ino, i.name as \"Iname\", i.price as \"Iprice\", p.name as \"Pname\", p.dough as \"Pdough\", p.price as \"Pprice\" FROM pizzas as \"p\" JOIN contient USING (pno) JOIN ingredients as \"i\" USING (ino) WHERE p.pno = ?";
+        String query = "SELECT i.ino, i.name as \"Iname\", i.price as \"Iprice\", p.name as \"Pname\", p.dough as \"Pdough\", p.price as \"Pprice\" FROM pizzas as \"p\" LEFT JOIN contient USING (pno) LEFT JOIN ingredients as \"i\" USING (ino) WHERE p.pno = ?";
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, pno);
             ResultSet rs = ps.executeQuery();
@@ -42,14 +42,17 @@ public class PizzaDAODatabase implements DAOPizza {
                 String namePizza = rs.getString("Pname");
                 String doughPizza = rs.getString("Pdough");
                 double pricePizza = rs.getFloat("Pprice");
+                pizza = new Pizza(pno, namePizza, doughPizza, pricePizza);
 
                 int idIngredients = rs.getInt("ino");
-                String nameIngredients = rs.getString("Iname");
-                int priceIngredients = rs.getInt("Iprice");
+                if (idIngredients != 0) {
+                    String nameIngredients = rs.getString("Iname");
+                    int priceIngredients = rs.getInt("Iprice");
 
-                pizza = new Pizza(pno, namePizza, doughPizza, pricePizza);
-                ingredientsMap.put(idIngredients, new Ingredient(idIngredients, nameIngredients, priceIngredients));
-                pizza.getIngredients().add(ingredientsMap.get(idIngredients));
+                    ingredientsMap.put(idIngredients, new Ingredient(idIngredients, nameIngredients, priceIngredients));
+                    pizza.getIngredients().add(ingredientsMap.get(idIngredients));
+                }
+
             }
 
             while (rs.next()) {
@@ -68,8 +71,9 @@ public class PizzaDAODatabase implements DAOPizza {
     }
 
     public boolean save(Pizza pizza) {
-        String query = "insert into pizza values ('?', '?', ?)";
-        try (PreparedStatement ps = con.prepareStatement(query)) {
+        String queryPizza = "INSERT INTO pizzas(name, dough, price) values (?, ?, ?)";
+
+        try (PreparedStatement ps = con.prepareStatement(queryPizza)) {
             ps.setString(1, pizza.getName());
             ps.setString(2, pizza.getDough());
             ps.setDouble(3, pizza.getPrice());
@@ -85,7 +89,7 @@ public class PizzaDAODatabase implements DAOPizza {
     public Collection<Pizza> findAll() {
         Map<Integer, Pizza> pizzasMap = new HashMap<>();
         Map<Integer, Ingredient> ingredientsMap = new HashMap<>();
-        String query = "SELECT i.ino, i.name as \"Iname\", i.price as \"Iprice\", p.pno, p.name as \"Pname\", p.dough as \"Pdough\", p.price as \"Pprice\" FROM pizzas as \"p\" JOIN contient USING (pno) JOIN ingredients as \"i\" USING (ino)";
+        String query = "SELECT i.ino, i.name as \"Iname\", i.price as \"Iprice\", p.pno, p.name as \"Pname\", p.dough as \"Pdough\", p.price as \"Pprice\" FROM pizzas as \"p\" LEFT JOIN contient USING (pno) LEFT JOIN ingredients as \"i\" USING (ino);";
 
         try (Statement statement = con.createStatement()) {
             ResultSet rs = statement.executeQuery(query);
@@ -122,6 +126,7 @@ public class PizzaDAODatabase implements DAOPizza {
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, pizza.getId());
             int rowsAffected = ps.executeUpdate();
+            System.out.println(rowsAffected + " -> pizza no" + pizza.getId());
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -132,5 +137,19 @@ public class PizzaDAODatabase implements DAOPizza {
     public static void main(String[] args) {
         PizzaDAODatabase pizzaDAODatabase = new PizzaDAODatabase();
         System.out.println(pizzaDAODatabase.findAll());
+    }
+
+    @Override
+    public void update(Pizza pizza) {
+        String query = "UPDATE pizzas SET name = ?, dough = ?, price = ? WHERE pno = ?";
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, pizza.getName());
+            ps.setString(2, pizza.getDough());
+            ps.setDouble(3, pizza.getPrice());
+            ps.setInt(4, pizza.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

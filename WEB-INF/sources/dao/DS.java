@@ -8,8 +8,6 @@ public class DS {
 
     public static Connection getConnection() throws SQLException, IOException, ClassNotFoundException {
         Properties p = new Properties();
-        String wd = new File(".").getAbsolutePath();
-        System.out.println("WDir : " + wd);
         try(InputStream in = DS.class.getClassLoader().getResourceAsStream("config.prop")) {
             p.load(in);
         }

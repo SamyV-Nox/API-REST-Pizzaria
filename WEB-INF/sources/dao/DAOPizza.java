@@ -38,4 +38,11 @@ public interface DAOPizza {
      * @param ingredient La pizza à supprimer.
      */
     public boolean delete(Pizza pizza);
+
+    /**
+     * Met a jour une pizza.
+     *
+     * @param ingredient La pizza à mettre a jour.
+     */
+    public void update(Pizza pizza);
 }

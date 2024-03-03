@@ -16,8 +16,8 @@ CREATE TABLE pizzas (
 CREATE TABLE contient(
     pno int,
     ino int,
-    constraint fk_pizza foreign key(pno) references pizzas(pno),
-    constraint fk_ingredient foreign key(ino) references ingredients(ino)
+    constraint fk_pizza foreign key(pno) references pizzas(pno) ON DELETE CASCADE,
+    constraint fk_ingredient foreign key(ino) references ingredients(ino) ON DELETE CASCADE
 );
 
 INSERT INTO ingredients (name, price) values

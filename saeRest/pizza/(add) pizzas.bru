@@ -1,0 +1,42 @@
+meta {
+  name: (add) pizzas
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/sae4-back-end/pizzas/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 6,
+    "name": "jambon fromage",
+    "dough": "Ã©paisse",
+    "price": 3,
+    "ingredients": [
+      {
+        "id": 1,
+        "name": "sauce tomate",
+        "price": 3
+      },
+      {
+        "id": 3,
+        "name": "mozzarella",
+        "price": 2
+      },
+      {
+        "id": 9,
+        "name": "jambon",
+        "price": 3
+      },
+      {
+        "id": 10,
+        "name": "emental",
+        "price": 2
+      }
+    ]
+  }
+}

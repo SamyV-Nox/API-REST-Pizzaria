@@ -106,6 +106,7 @@ public class Pizza {
      */
     public double getFinalPrice() {
         double price = getPrice();
+        if (ingredients == null) return price;
         for (Ingredient ingredient : ingredients) {
             price += ingredient.getPrice();
         }
