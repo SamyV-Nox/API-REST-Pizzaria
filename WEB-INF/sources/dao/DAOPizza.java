@@ -6,6 +6,8 @@ import dto.Pizza;
 /**
  * Interface pour le DAO (Data Access Object) des pizzas.
  * Définit les opérations de base pour accéder aux données des pizzas.
+ * 
+ * @author samy.vancalster.etu@univ-lille.fr
  */
 public interface DAOPizza {
 
@@ -45,4 +47,9 @@ public interface DAOPizza {
      * @param ingredient La pizza à mettre a jour.
      */
     public void update(Pizza pizza);
+
+    /**
+     * Ferme la ressource associée à ce DAO.
+     */ 
+    public void close();    
 }

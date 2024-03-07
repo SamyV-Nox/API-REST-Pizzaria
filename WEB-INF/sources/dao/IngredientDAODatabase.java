@@ -1,6 +1,5 @@
 package dao;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,14 +33,10 @@ public class IngredientDAODatabase implements DAOIngredient {
 
     public IngredientDAODatabase() {
         try {
-            con = DS.getConnection();
-        } catch (SQLException e) {
+            con = DataBaseConnection.getConnection();
+        } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("sql error");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Jar non trouvé : " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("file not found : " + e.getMessage());
+            con = null;
         }
     }
 

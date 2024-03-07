@@ -3,7 +3,6 @@ package controleurs;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,49 +17,82 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/pizzas/*")
 public class PizzaRestAPI extends HttpServlet {
-    private DAOPizza pizzaDAO;
-    private ObjectMapper objectMapper;
+    private static final DAOPizza PIZZA_DAO = new PizzaDAODatabase();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public PizzaRestAPI() {
-        pizzaDAO = new PizzaDAODatabase();
-        objectMapper = new ObjectMapper();
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String CHARACTER_ENCODING = "UTF-8";
+
+    private void formatResponse(HttpServletResponse res) {
+        res.setContentType(CONTENT_TYPE);
+        res.setCharacterEncoding(CHARACTER_ENCODING);
+    }
+
+    private boolean isPathOfAll(HttpServletRequest req) {
+        String pathInfo = req.getPathInfo();
+        return pathInfo == null || pathInfo.equals("/");
+    }
+
+    private boolean isPathOfFinalPrice(HttpServletRequest req) {
+        String[] pathParts = req.getPathInfo().split("/");
+        return pathParts.length == 3 && pathParts[2].equals("prixfinal");
+    }
+
+    private boolean isPathOfName(HttpServletRequest req) {
+        String[] pathParts = req.getPathInfo().split("/");
+        return pathParts.length == 3 && pathParts[2].equals("name");
+    }
+
+    private int getId(HttpServletRequest req) {
+        String[] pathParts = req.getPathInfo().split("/");
+        int id = -1;
+        try {
+            id = Integer.parseInt(pathParts[1]);
+            return id;
+        } catch (NumberFormatException e) {
+            return id;
+        }
+    }
+
+    private boolean isLongPath(HttpServletRequest req) {
+        String[] pathParts = req.getPathInfo().split("/");
+        return pathParts.length > 0;
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-            getAllPizzas(req, res);
+        formatResponse(res);
+        
+        if (isPathOfAll(req)) {
+            getAllPizzas(res);
         } else {
-            String[] pathParts = pathInfo.split("/");
-            if (pathParts.length > 0) {
-                int id;
-                try {
-                    id = Integer.parseInt(pathParts[1]);
-                } catch (NumberFormatException e) {
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
+            if (isLongPath(req)) {
+                final int ID = getId(req);
+                if (ID != -1) {
+                    if (isPathOfName(req)) {
+                        getPizzaName(ID, res);
+                    } else if (isPathOfFinalPrice(req)) {
+                        getPizzaFinalPrice(ID, res);
+                    } else {
+                        getPizzaById(ID, res);
+                    }
                 }
-                if (pathParts.length == 3 && pathParts[2].equals("name")) {
-                    getPizzaName(id, res);
-                } else if (pathParts.length == 3 && pathParts[2].equals("prixfinal")) {
-                    getPizzaFinalPrice(id, res);
-                } else {
-                    getPizzaById(id, res);
-                }
-
             } else {
-                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
+        PIZZA_DAO.close();
     }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-
         if (pathInfo != null && pathInfo.equals("/")) {
-            addPizza(req, res);
+            try {
+                addPizza(req, res);
+            } catch (Exception e) {
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -70,16 +102,20 @@ public class PizzaRestAPI extends HttpServlet {
     public void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
         if (pathInfo != null && isValidId(pathInfo)) {
-            int id = Integer.parseInt(pathInfo.substring(1));
-
-            deletePizza(id, res);
+            int id = 0;
+            try {
+                id = Integer.parseInt(pathInfo.substring(1));
+                deletePizza(id, res);
+            } catch (Exception e) {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
+    @Override
     public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        System.out.println(req.getMethod());
         super.service(req, res);
     }
 
@@ -88,7 +124,7 @@ public class PizzaRestAPI extends HttpServlet {
         if (pathInfo != null && isValidId(pathInfo)) {
             int id = Integer.parseInt(pathInfo.substring(1));
 
-            Pizza pizza = pizzaDAO.findById(id);
+            Pizza pizza = PIZZA_DAO.findById(id);
             if (pizza != null) {
                 String requestBody = req.getReader().lines().reduce("", String::concat);
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -96,68 +132,68 @@ public class PizzaRestAPI extends HttpServlet {
                 double newPrice = jsonNode.get("price").asDouble();
 
                 pizza.setPrice(newPrice);
-                pizzaDAO.update(pizza);
+                PIZZA_DAO.update(pizza);
 
-                res.setContentType("application/json");
-                res.setCharacterEncoding("UTF-8");
                 res.getWriter().write(objectMapper.writeValueAsString(pizza));
-
                 res.setStatus(HttpServletResponse.SC_OK);
-            }  
+            }
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
-    
-    private void deletePizza(int id, HttpServletResponse res) throws IOException {
-        Pizza pizza = pizzaDAO.findById(id);
-        System.out.println(pizza);
+
+    private void deletePizza(int id, HttpServletResponse res) {
+        Pizza pizza = PIZZA_DAO.findById(id);
         if (pizza != null) {
-            pizzaDAO.delete(pizza);
+            PIZZA_DAO.delete(pizza);
             res.setStatus(HttpServletResponse.SC_OK);
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private void getAllPizzas(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    private void getAllPizzas(HttpServletResponse res) {
         try {
-            Collection<Pizza> pizza = pizzaDAO.findAll();
-            res.setContentType("application/json");
-            res.setCharacterEncoding("UTF-8");
-            res.getWriter().write(objectMapper.writeValueAsString(pizza));
-        } catch (JsonProcessingException e) {
-            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Collection<Pizza> pizza = PIZZA_DAO.findAll();
+            res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pizza));
+        } catch (Exception e) {
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void getPizzaById(int id, HttpServletResponse res) throws IOException {
-        Pizza pizza = pizzaDAO.findById(id);
+    private void getPizzaById(int id, HttpServletResponse res) {
+        Pizza pizza = PIZZA_DAO.findById(id);
         if (pizza != null) {
-            res.setContentType("application/json");
-            res.setCharacterEncoding("UTF-8");
-            res.getWriter().write(objectMapper.writeValueAsString(pizza));
+            try {
+                res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pizza));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private void getPizzaName(int id, HttpServletResponse res) throws IOException {
-        Pizza pizza = pizzaDAO.findById(id);
+    private void getPizzaName(int id, HttpServletResponse res) {
+        Pizza pizza = PIZZA_DAO.findById(id);
         if (pizza != null) {
-            res.setContentType("text/plain");
-            res.setCharacterEncoding("UTF-8");
-            res.getWriter().write(pizza.getName());
+            try {
+                res.getWriter().write(pizza.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private void getPizzaFinalPrice(int id, HttpServletResponse res) throws IOException {
-        Pizza pizza = pizzaDAO.findById(id);
+    private void getPizzaFinalPrice(int id, HttpServletResponse res) {
+        Pizza pizza = PIZZA_DAO.findById(id);
         if (pizza != null) {
-            res.setContentType("text/plain");
-            res.setCharacterEncoding("UTF-8");
-            res.getWriter().write("" + pizza.getFinalPrice());
+            try {
+                res.getWriter().write("" + pizza.getFinalPrice());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -173,14 +209,21 @@ public class PizzaRestAPI extends HttpServlet {
         }
     }
 
-    private void addPizza(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        String requestBody = req.getReader().lines().reduce("", String::concat);
-        Pizza ingredient = objectMapper.readValue(requestBody, Pizza.class);
-        Pizza existingIngredient = pizzaDAO.findById(ingredient.getId());
-        if (existingIngredient != null) {
+    private void addPizza(HttpServletRequest req, HttpServletResponse res) {
+        Pizza existingPizza = null;
+        Pizza pizza = null;
+        try {
+            String requestBody = req.getReader().lines().reduce("", String::concat);
+            pizza = OBJECT_MAPPER.readValue(requestBody, Pizza.class);
+            existingPizza = PIZZA_DAO.findById(pizza.getId());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (existingPizza != null) {
             res.setStatus(HttpServletResponse.SC_CONFLICT);
         } else {
-            pizzaDAO.save(ingredient);
+            PIZZA_DAO.save(pizza);
             res.setStatus(HttpServletResponse.SC_CREATED);
         }
     }

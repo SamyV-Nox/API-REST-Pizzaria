@@ -1,7 +1,5 @@
 package dao;
 
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,23 +10,10 @@ import java.util.Map;
 
 import dto.Ingredient;
 import dto.Pizza;
+  
 
-public class PizzaDAODatabase implements DAOPizza {
 
-    private Connection con;
-
-    public PizzaDAODatabase() {
-        try {
-            con = DS.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("sql error");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Jar non trouvé : " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("file not found : " + e.getMessage());
-        }
-    }
+public class PizzaDAODatabase extends DAO implements DAOPizza {
 
     public Pizza findById(int pno) {
         Pizza pizza = null;
@@ -126,17 +111,11 @@ public class PizzaDAODatabase implements DAOPizza {
         try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, pizza.getId());
             int rowsAffected = ps.executeUpdate();
-            System.out.println(rowsAffected + " -> pizza no" + pizza.getId());
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        PizzaDAODatabase pizzaDAODatabase = new PizzaDAODatabase();
-        System.out.println(pizzaDAODatabase.findAll());
     }
 
     @Override

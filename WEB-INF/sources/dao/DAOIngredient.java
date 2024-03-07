@@ -6,6 +6,7 @@ import dto.Ingredient;
 /**
  * Interface pour le DAO (Data Access Object) des ingrédients.
  * Définit les opérations de base pour accéder aux données des ingrédients.
+ * @author samy.vancalster@univ-lille.fr
  */
 public interface DAOIngredient {
 

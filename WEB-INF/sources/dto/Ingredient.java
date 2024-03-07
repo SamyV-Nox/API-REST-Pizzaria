@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Représente un ingrédient utilisé dans une pizza.
+ * @author samy.vancalster.etu@univ-lille.fr
+ * @author lisa.haye.etu@univ-lille.fr
  */
 public class Ingredient {
 
@@ -119,9 +121,7 @@ public class Ingredient {
         if (getClass() != obj.getClass())
             return false;
         Ingredient other = (Ingredient) obj;
-        if (id != other.id)
-            return false;
-        return true;
+        return id != other.id;
     }
 
     @Override

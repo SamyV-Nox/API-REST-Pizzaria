@@ -14,10 +14,12 @@ public class IngredientDAOList implements DAOIngredient {
         ingredients.add(new Ingredient(3, "lardons", 12));
     }
 
+    @Override
     public List<Ingredient> findAll() {
         return ingredients;
     }
 
+    @Override
     public Ingredient findById(int id) {
         for (Ingredient ingredient : ingredients) {
             if (ingredient.getId() == id) {
@@ -27,6 +29,7 @@ public class IngredientDAOList implements DAOIngredient {
         return null;
     }
 
+    @Override
     public boolean save(Ingredient ingredient) {
         return ingredients.add(ingredient);
     }

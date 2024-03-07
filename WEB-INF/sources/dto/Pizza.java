@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Représente une pizza.
+ * @author samy.vancalster.etu@univ-lille.fr
+ * @author lisa.haye.etu@univ-lille.fr
  */
 public class Pizza {
     
@@ -59,9 +61,7 @@ public class Pizza {
      * Constructeur par défaut de la classe Pizza.
      * Ce constructeur est requis pour la désérialisation JSON.
      */
-    public Pizza() {
-    }
-
+    public Pizza() {}
 
     /**
      * Retourne l'ID de la pizza.
@@ -105,12 +105,13 @@ public class Pizza {
      * @return Le prix final de la pizza.
      */
     public double getFinalPrice() {
-        double price = getPrice();
-        if (ingredients == null) return price;
+        double finalPrice;
+        finalPrice = getPrice();
+        if (ingredients == null) return finalPrice;
         for (Ingredient ingredient : ingredients) {
-            price += ingredient.getPrice();
+            finalPrice += ingredient.getPrice();
         }
-        return price;
+        return finalPrice;
     }
 
     /**
@@ -176,9 +177,7 @@ public class Pizza {
         if (getClass() != obj.getClass())
             return false;
         Pizza other = (Pizza) obj;
-        if (id != other.id)
-            return false;
-        return true;
+        return id != other.id;
     }    
 
     @Override
