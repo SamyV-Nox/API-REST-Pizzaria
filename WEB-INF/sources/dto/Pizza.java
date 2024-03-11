@@ -3,28 +3,24 @@ package dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Représente une pizza.
  * @author samy.vancalster.etu@univ-lille.fr
  * @author lisa.haye.etu@univ-lille.fr
  */
 public class Pizza {
-    
-    @JsonProperty("id")
+
     private int id;
 
-    @JsonProperty("name")
+
     private String name;
 
-    @JsonProperty("dough")
+
     private String dough;
 
-    @JsonProperty("price")
+
     private double price;
 
-    @JsonProperty("ingredients")
     private List<Ingredient> ingredients;
 
     /**

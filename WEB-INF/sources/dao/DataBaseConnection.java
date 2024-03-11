@@ -8,7 +8,7 @@ import java.util.Properties;
 /**
  * Classe utilitaire pour établir une connexion à la base de données.
  * 
- * @author lisa.haye.etu@univ-lille.fr
+ * @author Lisa Haye
  */
 public class DataBaseConnection {
 

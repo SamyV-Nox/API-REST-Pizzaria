@@ -58,6 +58,7 @@ public abstract class API extends HttpServlet {
         } catch (ServletException | IOException e) {
             e.printStackTrace();
         }
+        
     }
 
     protected void doPatch(HttpServletRequest req, HttpServletResponse res) {

@@ -1,6 +1,5 @@
 package dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,18 +11,8 @@ import java.util.Map;
 import dto.Ingredient;
 import dto.Pizza;
 
-public class PizzaDAO {
+public class PizzaDao extends Dao {
 
-    Connection con;
-
-    public PizzaDAO() {
-        try {
-            con = DataBaseConnection.getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-            con = null;
-        }
-    }
 
     public Pizza findById(int pno) {
         Pizza pizza = null;
@@ -80,7 +69,6 @@ public class PizzaDAO {
         return false;
     }
 
-    @Override
     public Collection<Pizza> findAll() {
         Map<Integer, Pizza> pizzasMap = new HashMap<>();
         Map<Integer, Ingredient> ingredientsMap = new HashMap<>();
@@ -115,7 +103,6 @@ public class PizzaDAO {
         return pizzasMap.values();
     }
 
-    @Override
     public boolean delete(Pizza pizza) {
         String query = "DELETE FROM pizzas WHERE pno = ?";
         try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -128,7 +115,6 @@ public class PizzaDAO {
         return false;
     }
 
-    @Override
     public void update(Pizza pizza) {
         String query = "UPDATE pizzas SET name = ?, dough = ?, price = ? WHERE pno = ?";
         try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -137,15 +123,6 @@ public class PizzaDAO {
             ps.setDouble(3, pizza.getPrice());
             ps.setInt(4, pizza.getId());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

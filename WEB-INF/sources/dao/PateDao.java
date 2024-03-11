@@ -1,6 +1,5 @@
 package dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,21 +9,26 @@ import java.util.List;
 
 import dto.Pate;
 
-public class PateDao {
-    Connection con;
+/**
+ * Cette classe gère l'accès aux données concernant les pâtes dans la base de données.
+ * Elle fournit des méthodes pour rechercher, insérer, mettre à jour et supprimer des pâtes.
+ * 
+ * @see Dao
+ * @author Samy Van Calster
+ */
+public class PateDao extends Dao {
 
-    public PateDao() {
-        try {
-            con = DataBaseConnection.getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-            con = null;
-        }
-    }
-
+    /**
+     * Recherche une pâte dans la base de données en fonction de son identifiant.
+     *
+     * @param id L'identifiant de la pâte à rechercher.
+     * @return La pâte trouvée, ou null si aucune pâte correspondante n'est trouvée.
+     * @throws SQLException Si une erreur survient lors de l'exécution de la requête SQL.
+     */
     public Pate findById(int id) throws SQLException {
         Pate res = null;
         final String QUERY = "SELECT * FROM pates WHERE dno = " + id;
+        
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(QUERY);
 
@@ -35,59 +39,84 @@ public class PateDao {
         return res;
     }
 
+    /**
+     * Recherche toutes les pâtes disponibles dans la base de données.
+     *
+     * @return Une liste contenant toutes les pâtes disponibles.
+     * @throws SQLException Si une erreur survient lors de l'exécution de la requête SQL.
+     */
     public List<Pate> findAll() throws SQLException {
-        List<Pate> res = new ArrayList<>();
+        List<Pate> pates = new ArrayList<>();
         final String QUERY = "SELECT * FROM pates";
+        
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(QUERY);
 
+            int dno;
+            String name;
+
             while (resultSet.next()) {
-                res.add(new Pate(resultSet.getInt("dno"), resultSet.getString("d_name")));
+                dno = resultSet.getInt("dno");
+                name = resultSet.getString("d_name");
+                pates.add(new Pate(dno, name));
             }
         }
-        return res;
+        return pates;
     }
 
+    /**
+     * Enregistre une nouvelle pâte dans la base de données.
+     *
+     * @param pate La pâte à enregistrer.
+     * @return true si l'enregistrement est réussi, false sinon.
+     */
     public boolean save(Pate pate) {
         final String QUERY = "INSERT INTO pates (d_name) VALUES (?)";
+        
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ps.setString(1, pate.getName());
+            
             int rowsInserted = ps.executeUpdate();
-            return rowsInserted > 0;
+            return 0 < rowsInserted;
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
     }
 
+    /**
+     * Met à jour une pâte existante dans la base de données.
+     *
+     * @param pate La pâte à mettre à jour.
+     * @return Le nombre de lignes affectées par la mise à jour.
+     */
     public int update(Pate pate) {
         final String QUERY = "UPDATE pates SET d_name = ? WHERE dno = ?";
+        
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ps.setString(1, pate.getName());
             ps.setInt(2, pate.getId());
+            
             return ps.executeUpdate();
         } catch (SQLException e) {
             return -1;
         }
     }
 
+    /**
+     * Supprime une pâte de la base de données en fonction de son identifiant.
+     *
+     * @param id L'identifiant de la pâte à supprimer.
+     * @return Le nombre de lignes affectées par la suppression.
+     */
     public int delete(int id) {
         final String QUERY = "DELETE FROM pates WHERE dno = ?";
+        
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ps.setInt(1, id);
+            
             return ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
             return -1;
-        }
-    }
-
-    public boolean close() {
-        try {
-            con.close();
-            return true;
-        } catch (SQLException e) {
-            return false;
         }
     }
 }

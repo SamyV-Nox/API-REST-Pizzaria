@@ -45,7 +45,7 @@ public class PateAPI extends API {
             Pate pate = PATE_DAO.findById(id);
             if (pate != null) {
                 res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate.getId()));
-                res.setStatus(HttpServletResponse.SC_ACCEPTED);
+                res.setStatus(HttpServletResponse.SC_OK);
             } else
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IOException | SQLException e) {
@@ -58,7 +58,7 @@ public class PateAPI extends API {
             Pate pate = PATE_DAO.findById(id);
             if (pate != null) {
                 res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate.getName()));
-                res.setStatus(HttpServletResponse.SC_ACCEPTED);
+                res.setStatus(HttpServletResponse.SC_OK);
             } else
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IOException | SQLException e) {
@@ -71,7 +71,7 @@ public class PateAPI extends API {
             List<Pate> pates = PATE_DAO.findAll();
             if (!pates.isEmpty()) {
                 res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pates));
-                res.setStatus(HttpServletResponse.SC_ACCEPTED);
+                res.setStatus(HttpServletResponse.SC_OK);
             } else
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IOException | SQLException e) {
@@ -84,7 +84,7 @@ public class PateAPI extends API {
             Pate pate = PATE_DAO.findById(id);
             if (pate != null) {
                 res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate));
-                res.setStatus(HttpServletResponse.SC_ACCEPTED);
+                res.setStatus(HttpServletResponse.SC_OK);
             } else
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IOException | SQLException e) {
@@ -169,5 +169,9 @@ public class PateAPI extends API {
         }
     }
 
-    
+    @Override
+    public void service(HttpServletRequest req, HttpServletResponse res) {
+        super.service(req, res);
+        PATE_DAO.close();
+    }
 }

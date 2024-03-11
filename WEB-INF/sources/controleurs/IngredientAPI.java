@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/ingredients/*")
 public class IngredientAPI extends API {
 
-    private static final IngredientDao INGREDIENT_DAO = new IngredientDao();
+    private static final IngredientDao DAO = new IngredientDao();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -57,7 +57,7 @@ public class IngredientAPI extends API {
 
     private List<Ingredient> getAll(HttpServletResponse res) {
         try {
-            List<Ingredient> ingredients = INGREDIENT_DAO.findAll();
+            List<Ingredient> ingredients = DAO.findAll();
             if (!ingredients.isEmpty()) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return ingredients;
@@ -74,7 +74,7 @@ public class IngredientAPI extends API {
 
     private Ingredient getById(HttpServletResponse res, int id) {
         try {
-            Ingredient ingredient = INGREDIENT_DAO.findById(id);
+            Ingredient ingredient = DAO.findById(id);
             if (ingredient != null) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return ingredient;
@@ -99,5 +99,11 @@ public class IngredientAPI extends API {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse res) {
         res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+    }
+
+    @Override
+    public void service(HttpServletRequest req, HttpServletResponse res) {
+        super.service(req, res);
+        DAO.close();
     }
 }

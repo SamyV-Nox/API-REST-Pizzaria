@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dao.PizzaDAO;
+import dao.PizzaDao;
 import dto.Pizza;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/pizzas/*")
 public class PizzaRestAPI extends HttpServlet {
 
-    private static PizzaDAO pizzaDAO = new PizzaDAO();
+    private static PizzaDao pizzaDAO = new PizzaDao();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String CONTENT_TYPE = "application/json";

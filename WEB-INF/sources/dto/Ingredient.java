@@ -2,17 +2,26 @@ package dto;
 
 /**
  * Représente un ingrédient utilisé dans une pizza.
- * @author samy.vancalster.etu@univ-lille.fr
- * @author lisa.haye.etu@univ-lille.fr
+ * Cette classe a été conçue pour gérer les ingrédients utilisés dans la composition des pizzas.
+ * Les ingrédients ont un identifiant unique, un nom et un prix.
+ * Le prix par défaut est de 0 euro.
+ * 
+ * @author Samy Van Calster
+ * @author Lisa Haye
  */
-
 public class Ingredient {
 
+    /** L'identifiant de l'ingrédient */
     private int id;
+
+    /** Le nom de l'ingrédient */
     private String name;
+
+    /** Le prix de l'ingrédient en euros */
     private double price = DEFAULT_PRICE;
 
-    private static final int DEFAULT_PRICE = 0; 
+    /** Le prix par défaut de l'ingrédient en euros */
+    private static final int DEFAULT_PRICE = 0;
 
     /**
      * Constructeur par défaut de la classe Ingredient.
@@ -22,10 +31,10 @@ public class Ingredient {
     }
 
     /**
-     * Constructeur de la classe Ingredient.
+     * Constructeur de la classe Ingredient avec des paramètres.
      *
-     * @param id   L'identifiant de l'ingrédient.
-     * @param name Le nom de l'ingrédient.
+     * @param id    L'identifiant de l'ingrédient.
+     * @param name  Le nom de l'ingrédient.
      * @param price Le prix de l'ingrédient.
      */
     public Ingredient(int id, String name, double price) {
@@ -83,7 +92,7 @@ public class Ingredient {
     /**
      * Retourne le prix de l'ingrédient.
      *
-     * @return Le prix de l'ingrédient.
+     * @return Le prix de l'ingrédient en euros.
      */
     public double getPrice() {
         return price;
@@ -92,12 +101,17 @@ public class Ingredient {
     /**
      * Modifie le prix de l'ingrédient.
      *
-     * @param price Le nouveau prix de l'ingrédient.
+     * @param price Le nouveau prix de l'ingrédient en euros.
      */
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
+    /**
+     * Retourne le code de hachage de l'ingrédient.
+     *
+     * @return Le code de hachage de l'ingrédient.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -106,6 +120,12 @@ public class Ingredient {
         return result;
     }
 
+    /**
+     * Compare l'ingrédient avec un autre objet pour vérifier s'ils sont égaux.
+     *
+     * @param obj L'objet à comparer avec l'ingrédient.
+     * @return true si les objets sont égaux, false sinon.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -118,8 +138,13 @@ public class Ingredient {
         return id != other.id;
     }
 
+    /**
+     * Retourne une représentation textuelle de l'ingrédient.
+     *
+     * @return Une chaîne de caractères représentant l'ingrédient avec son nom et son prix.
+     */
     @Override
     public String toString() {
-        return "{id=" + id + ", name=" + name + ", price=" + price + "}";
+        return name + " (" + price + "€)";
     }
 }
