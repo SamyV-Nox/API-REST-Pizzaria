@@ -1,22 +1,16 @@
 package dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Représente un ingrédient utilisé dans une pizza.
  * @author samy.vancalster.etu@univ-lille.fr
  * @author lisa.haye.etu@univ-lille.fr
  */
+
 public class Ingredient {
 
-    @JsonProperty("id")
     private int id;
-
-    @JsonProperty("name")
     private String name;
-
-    @JsonProperty("price")
-    private int price;
+    private double price = DEFAULT_PRICE;
 
     private static final int DEFAULT_PRICE = 0; 
 
@@ -34,7 +28,7 @@ public class Ingredient {
      * @param name Le nom de l'ingrédient.
      * @param price Le prix de l'ingrédient.
      */
-    public Ingredient(int id, String name, int price) {
+    public Ingredient(int id, String name, double price) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -91,7 +85,7 @@ public class Ingredient {
      *
      * @return Le prix de l'ingrédient.
      */
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
