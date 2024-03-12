@@ -2,7 +2,10 @@ package controleurs;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import dao.PateDao;
 import dto.Pate;
@@ -14,24 +17,24 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/pates/*")
 public class PateAPI extends API {
 
-    private static final PateDao PATE_DAO = new PateDao();
+    private static final PateDao DAO = new PateDao();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String[] parameter = getParametre(req);
 
         if (parameter.length == 0)
-            getAll(res);
+            send(res, getAll(res));
         else if (1 <= parameter.length) {
             int id = isNumber(parameter[1]);
             if (id == -1)
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            else if (parameter.length == 2)
-                getById(res, id);
+            else if (parameter.length == 2) 
+                send(res, getById(res, id));
             else if (parameter.length == 3 && parameter[2].equals("id"))
-                getIdById(res, id);
+                send(res, getById(res, id).getId());
             else if (parameter.length == 3 && parameter[2].equals("name"))
-                getNamebyId(res, id);
+                send(res, getById(res, id).getName());
             else
                 res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 
@@ -40,56 +43,36 @@ public class PateAPI extends API {
         }
     }
 
-    private void getIdById(HttpServletResponse res, int id) {
+    private List<Pate> getAll(HttpServletResponse res) {
         try {
-            Pate pate = PATE_DAO.findById(id);
-            if (pate != null) {
-                res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate.getId()));
-                res.setStatus(HttpServletResponse.SC_OK);
-            } else
-                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException | SQLException e) {
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private void getNamebyId(HttpServletResponse res, int id) {
-        try {
-            Pate pate = PATE_DAO.findById(id);
-            if (pate != null) {
-                res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate.getName()));
-                res.setStatus(HttpServletResponse.SC_OK);
-            } else
-                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException | SQLException e) {
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private void getAll(HttpServletResponse res) {
-        try {
-            List<Pate> pates = PATE_DAO.findAll();
+            List<Pate> pates = DAO.findAll();
             if (!pates.isEmpty()) {
-                res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pates));
                 res.setStatus(HttpServletResponse.SC_OK);
-            } else
+                return pates;
+            } else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException | SQLException e) {
+                return new ArrayList<>();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return new ArrayList<>();
         }
     }
 
-    public void getById(HttpServletResponse res, int id) {
+    public Pate getById(HttpServletResponse res, int id) {
         try {
-            Pate pate = PATE_DAO.findById(id);
+            Pate pate = DAO.findById(id);
             if (pate != null) {
-                res.getWriter().write(OBJECT_MAPPER.writeValueAsString(pate));
                 res.setStatus(HttpServletResponse.SC_OK);
+                return pate;
             } else
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
+            e.getStackTrace();
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+        return null;
     }
 
     @Override
@@ -97,7 +80,7 @@ public class PateAPI extends API {
         try {
             String requestBody = req.getReader().lines().reduce("", String::concat);
             Pate pate = OBJECT_MAPPER.readValue(requestBody, Pate.class);
-            PATE_DAO.save(pate);
+            DAO.save(pate);
             res.setStatus(HttpServletResponse.SC_OK);
         } catch (IOException e) {
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -120,24 +103,31 @@ public class PateAPI extends API {
 
     public void patch(HttpServletRequest req, HttpServletResponse res, int id) {
         try {
-            Pate pate = PATE_DAO.findById(id);
-            String requestBody = req.getReader().lines().reduce("", String::concat);
-            String newName = OBJECT_MAPPER.readTree(requestBody).get("name").asText();
-
-            if (!newName.isEmpty()) {
-                pate.setName(newName);
-                
-                int code = PATE_DAO.update(pate);
-                if (code == 0)
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                else if (code == -1)
+            Pate pate = DAO.findById(id);
+            if (pate == null) {
+                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+            else {
+                String requestBody = req.getReader().lines().reduce("", String::concat);
+                JsonNode json = OBJECT_MAPPER.readTree(requestBody);
+                JsonNode jsonName = json.get("name");
+    
+                String newName = (jsonName != null)? jsonName.asText() : null;
+    
+                if (newName != null) {
+                    pate.setName(newName);
+                    
+                    int code = DAO.update(pate);
+                    if (code < 0)
+                        res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    else
+                        res.setStatus(HttpServletResponse.SC_OK);
+                } else
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                else
-                    res.setStatus(HttpServletResponse.SC_OK);
-            } else
-                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
         } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            e.printStackTrace();
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -157,7 +147,7 @@ public class PateAPI extends API {
 
     private void delete(HttpServletResponse res, int id) {
         try {
-            int code = PATE_DAO.delete(id);
+            int code = DAO.delete(id);
             if (code == 0)
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             else if (code == -1)
@@ -167,11 +157,5 @@ public class PateAPI extends API {
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-    }
-
-    @Override
-    public void service(HttpServletRequest req, HttpServletResponse res) {
-        super.service(req, res);
-        PATE_DAO.close();
     }
 }

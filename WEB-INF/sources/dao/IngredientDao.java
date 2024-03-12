@@ -118,10 +118,20 @@ public class IngredientDao extends Dao {
      * @return Le nombre de lignes affectées par la suppression.
      */
     public int delete(Ingredient ingredient) {
+        return delete(ingredient.getId());
+    }
+
+    /**
+     * Supprime un ingrédient de la base de données.
+     *
+     * @param id L'identifiant de l'ingrédient à supprimer.
+     * @return Le nombre de lignes affectées par la suppression.
+     */
+    public int delete(int id) {
         final String QUERY = "DELETE FROM ingredients WHERE ino = ?";
         
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
-            ps.setInt(1, ingredient.getId());
+            ps.setInt(1, id);
             
             return ps.executeUpdate();
         } catch (SQLException e) {
