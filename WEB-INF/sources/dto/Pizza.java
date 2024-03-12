@@ -16,8 +16,7 @@ public class Pizza {
     private String name;
 
 
-    private String dough;
-
+    private Pate pate;
 
     private double price;
 
@@ -32,10 +31,10 @@ public class Pizza {
      * @param price       Le prix de base de la pizza.
      * @param ingredients La liste des ingrédients de la pizza.
      */
-    public Pizza(int id, String name, String dough, double price, List<Ingredient> ingredients) {
+    public Pizza(int id, String name, Pate pate, double price, List<Ingredient> ingredients) {
         this.id = id;
         this.name = name;
-        this.dough = dough;
+        this.pate = pate;
         this.price = price;
         this.ingredients = ingredients;
     }
@@ -49,8 +48,8 @@ public class Pizza {
      * @param dough       Le type de pâte de la pizza.
      * @param price       Le prix de base de la pizza.
      */
-    public Pizza(int id, String name, String dough, double price) {
-        this(id, name, dough, price, new ArrayList<>());
+    public Pizza(int id, String name, Pate pate, double price) {
+        this(id, name, pate, price, new ArrayList<>());
     }
 
     /**
@@ -82,8 +81,8 @@ public class Pizza {
      *
      * @return Le type de pâte de la pizza.
      */
-    public String getDough() {
-        return dough;
+    public Pate getPate() {
+        return pate;
     }
 
     /**
@@ -132,10 +131,10 @@ public class Pizza {
     /**
      * Modifie le type de pâte de la pizza.
      *
-     * @param dough Le nouveau type de pâte de la pizza.
+     * @param pate Le nouveau type de pâte de la pizza.
      */
-    public void setDough(String dough) {
-        this.dough = dough;
+    public void setPate(Pate pate) {
+        this.pate = pate;
     }
 
     /**
@@ -178,7 +177,7 @@ public class Pizza {
 
     @Override
     public String toString() {
-        return "{id" + id + ",name=" + name + ",dough=" + dough + ",price=" + price + ",ingredients="
+        return "{id" + id + ",name=" + name + ",dough=" + pate + ",price=" + price + ",ingredients="
                 + ingredients + "}\n";
     }    
 }

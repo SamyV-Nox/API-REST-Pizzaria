@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS pizzas_ingredients,ingredients, pizzas, pates;
 
 CREATE TABLE pates(
     dno SERIAL PRIMARY KEY,
-    d_name VARCHAR(20)
+    d_name UNIQUE NOT NULL VARCHAR(20)
 );
 
 INSERT INTO pates (d_name) VALUES 
@@ -19,8 +19,8 @@ INSERT INTO pates (d_name) VALUES
 
 CREATE TABLE ingredients(
     ino SERIAL PRIMARY KEY,
-    i_nom VARCHAR(20),
-    i_prix FLOAT 
+    i_nom UNIQUE VARCHAR(20) NOT NULL,
+    i_prix FLOAT  NOT NULL
 );
 
 INSERT INTO ingredients(i_nom, i_prix) VALUES
@@ -50,7 +50,7 @@ INSERT INTO ingredients(i_nom, i_prix) VALUES
 
 CREATE TABLE pizzas(
     pno SERIAL PRIMARY KEY,
-    p_nom VARCHAR(20) NOT NULL,
+    p_nom UNIQUE VARCHAR(20) NOT NULL,
     dno INT DEFAULT 1,
     p_prix FLOAT NOT NULL,
 
