@@ -1,11 +1,14 @@
 
-DROP TABLE IF EXISTS pizzas_ingredients,ingredients, pizzas, pates;
+DROP TABLE IF EXISTS recettes CASCADE;
+DROP TABLE IF EXISTS ingredients CASCADE;
+DROP TABLE IF EXISTS pizzas CASCADE;
+DROP TABLE IF EXISTS pates;
 
 -- PATES
 
 CREATE TABLE pates(
     dno SERIAL PRIMARY KEY,
-    d_name UNIQUE NOT NULL VARCHAR(20)
+    d_name VARCHAR(20) NOT NULL
 );
 
 INSERT INTO pates (d_name) VALUES 
@@ -19,7 +22,7 @@ INSERT INTO pates (d_name) VALUES
 
 CREATE TABLE ingredients(
     ino SERIAL PRIMARY KEY,
-    i_nom UNIQUE VARCHAR(20) NOT NULL,
+    i_nom VARCHAR(20) NOT NULL,
     i_prix FLOAT  NOT NULL
 );
 
@@ -50,7 +53,7 @@ INSERT INTO ingredients(i_nom, i_prix) VALUES
 
 CREATE TABLE pizzas(
     pno SERIAL PRIMARY KEY,
-    p_nom UNIQUE VARCHAR(20) NOT NULL,
+    p_nom VARCHAR(20) NOT NULL,
     dno INT DEFAULT 1,
     p_prix FLOAT NOT NULL,
 
@@ -71,7 +74,7 @@ INSERT INTO pizzas(p_nom, dno, p_prix) VALUES
 
 -- PIZZAS / INGREDIENTS
 
-CREATE TABLE pizzas_ingredients(
+CREATE TABLE recettes(
     pno INT,
     ino INT,
 
@@ -83,7 +86,7 @@ CREATE TABLE pizzas_ingredients(
 -- Associer les ingrédients avec les pizzas
 
 -- Margherita
-INSERT INTO pizzas_ingredients(pno, ino) VALUES 
+INSERT INTO recettes(pno, ino) VALUES 
 (1, 1), -- Sauce tomate
 (1, 2), -- Mozzarella
 -- Quattro Stagioni

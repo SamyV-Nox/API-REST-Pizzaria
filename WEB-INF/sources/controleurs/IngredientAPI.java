@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import dao.IngredientDao;
 import dto.Ingredient;
-import dto.Pate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;

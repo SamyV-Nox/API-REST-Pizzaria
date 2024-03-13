@@ -9,18 +9,21 @@ import java.util.List;
  * @author lisa.haye.etu@univ-lille.fr
  */
 public class Pizza {
+    
+    /** L'ID de la pizza */
+    private int id; 
 
-    private int id;
+    /** Le nom de la pizza */
+    private String name; 
 
+    /** Le type de pâte de la pizza */
+    private Pate pate; 
 
-    private String name;
+    /** Le prix de base de la pizza */
+    private double price; 
 
-
-    private Pate pate;
-
-    private double price;
-
-    private List<Ingredient> ingredients;
+    /** La liste des ingrédients de la pizza */
+    private List<Ingredient> ingredients; 
 
     /**
      * Constructeur de la classe Pizza.
@@ -118,6 +121,13 @@ public class Pizza {
         return ingredients;
     }
 
+    public boolean add(Ingredient ingredient) {
+        return ingredients.add(ingredient);
+    }
+
+    public boolean remove(Ingredient ingredient) {
+        return ingredients.remove(ingredient);
+    }
 
     /**
      * Modifie le nom de la pizza.

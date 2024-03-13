@@ -119,4 +119,9 @@ public class PateDao extends Dao {
             return -1;
         }
     }
+
+    public static void main(String[] args) throws SQLException {
+        PateDao pd = new PateDao();
+        System.out.println(pd.findAll());
+    }
 }
