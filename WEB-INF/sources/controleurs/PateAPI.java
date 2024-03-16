@@ -110,6 +110,9 @@ public class PateAPI extends API {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
+        else {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 
     public void patch(HttpServletRequest req, HttpServletResponse res, int id) {

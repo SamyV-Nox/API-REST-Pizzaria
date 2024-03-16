@@ -165,13 +165,30 @@ public class PizzaAPI extends API {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) {
+        String[] parameter = getParametre(req);
+
+        if (parameter.length == 0) {
+            
+        } else if (parameter.length == 3) {
+
+            int pno = isNumber(parameter[1]);
+            int ino = isNumber(parameter[2]);
+
+            if (pno != -1 && ino != -1) {
+                addIngredient(res, pno, ino);
+            } else {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        }
+    }
+
+    private void addIngredient(HttpServletResponse res, int pno, int ino) {
         try {
-            String requestBody = req.getReader().lines().reduce("", String::concat);
-            Pizza ingredient = OBJECT_MAPPER.readValue(requestBody, Pizza.class);
-            DAO.save(ingredient);
+            DAO.addIngredient(pno, ino);
             res.setStatus(HttpServletResponse.SC_OK);
-        } catch (IOException e) {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (Exception e) {
+            res.setStatus(HttpServletResponse.SC_CONFLICT);
+            e.printStackTrace();
         }
     }
 
