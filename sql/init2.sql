@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS pates;
 
 CREATE TABLE pates(
     dno SERIAL PRIMARY KEY,
-    d_nom VARCHAR(20) NOT NULL
+    d_nom VARCHAR(20) UNIQUE NOT NULL
 );
 
 INSERT INTO pates (d_nom) VALUES 
@@ -22,7 +22,7 @@ INSERT INTO pates (d_nom) VALUES
 
 CREATE TABLE ingredients(
     ino SERIAL PRIMARY KEY,
-    i_nom VARCHAR(20) NOT NULL,
+    i_nom VARCHAR(20) UNIQUE NOT NULL,
     i_prix FLOAT  NOT NULL
 );
 
@@ -42,7 +42,6 @@ INSERT INTO ingredients(i_nom, i_prix) VALUES
 ('Anchois', 2.00),
 ('Câpres', 1.50),
 ('Origan', 1.00),
-('Ananas', 1.50),
 ('Fromage de chèvre', 3.00),
 ('Miel', 2.00),
 ('Gorgonzola', 2.50),
@@ -53,7 +52,7 @@ INSERT INTO ingredients(i_nom, i_prix) VALUES
 
 CREATE TABLE pizzas(
     pno SERIAL PRIMARY KEY,
-    p_nom VARCHAR(20) NOT NULL,
+    p_nom VARCHAR(20) UNIQUE NOT NULL,
     dno INT DEFAULT 1,
     p_prix FLOAT NOT NULL,
 

@@ -100,13 +100,81 @@ public class PizzaDao extends Dao {
         return pizzas;
     }
 
+    public int findIdByName(String name) throws SQLException {
+        final String QUERY = "SELECT pno FROM pizzas WHERE p_nom = ?;";
+        int pno = -1;
+        try (PreparedStatement ps = con.prepareStatement(QUERY)) {
+            ps.setString(1, name);
+            ResultSet resultSet = ps.executeQuery();
+
+            if (resultSet.next()) {
+                pno = resultSet.getInt("pno");
+            }
+        }
+        return pno;
+    }
+
     public static void main(String[] args) throws SQLException {
         PizzaDao pd = new PizzaDao();
-        System.out.println(pd.findAll());
+        System.out.println(pd.findIdByName(pd.findById(1).getName()));
     }
 
     public int update(Pizza pizza) {
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        final String QUERY = "UPDATE pizzas SET p_nom = ?, dno = ?, p_prix = ? WHERE pno = ?";
+
+        try (PreparedStatement updateStatement = con.prepareStatement(QUERY)) {
+
+            con.setAutoCommit(false); // Commencer une transaction
+
+            deleteIngredient(pizza);
+            saveIngredient(pizza);
+
+            updateStatement.setString(1, pizza.getName());
+            updateStatement.setInt(2, pizza.getPate().getId());
+            updateStatement.setDouble(3, pizza.getPrice());
+            updateStatement.setInt(4, pizza.getId());
+            int rowsAffected = updateStatement.executeUpdate();
+
+            con.commit(); // Valider la transaction
+
+            con.setAutoCommit(true); // Retourner à l'autocommit par défaut
+
+            return rowsAffected;
+        } catch (SQLException e) {
+            try {
+                con.rollback(); // Annuler la transaction en cas d'erreur
+                return -1;
+            } catch (SQLException rollbackException) {
+                return -1;
+            }        
+        }
+    }
+
+    private int deleteIngredient(Pizza pizza) throws SQLException {
+        final String QUERY = "DELETE FROM recettes WHERE pno = ?";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
+            preparedStatement.setInt(1, pizza.getId());
+            return preparedStatement.executeUpdate();
+        }
+    }
+
+    private void saveIngredient(Pizza pizza) throws SQLException {
+        final String QUERY = "INSERT INTO recettes(pno, ino) VALUES (?, ?)";
+
+        try (PreparedStatement ps = con.prepareStatement(QUERY)) {
+            for (Ingredient ingredient : pizza.getIngredients()) {
+                ps.setInt(1, pizza.getId());
+                ps.setInt(2, ingredient.getId());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private void updateIngredient(Pizza pizza) throws SQLException {
+        deleteIngredient(pizza);
+        saveIngredient(pizza);
     }
 
     public void save(Pizza ingredient) {

@@ -8,7 +8,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import dao.PateDao;
-import dto.Ingredient;
 import dto.Pate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

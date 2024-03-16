@@ -8,6 +8,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import dao.PizzaDao;
+import dto.Ingredient;
+import dto.Pate;
 import dto.Pizza;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -117,24 +119,43 @@ public class PizzaAPI extends API {
             String requestBody = req.getReader().lines().reduce("", String::concat);
             JsonNode json = OBJECT_MAPPER.readTree(requestBody);
 
-            JsonNode jsonName = json.get("name");
-            JsonNode jsonPrice = json.get("price");
-
-            String newName = (jsonName != null) ? jsonName.asText() : null;
-            Double newPrice = (jsonPrice != null) ? jsonPrice.asDouble() : null;
-
-            if (newName != null)
-                pizza.setName(newName);
-            if (newPrice != null)
-                pizza.setPrice(newPrice);
-
-            int code = DAO.update(pizza);
-            if (code == 0)
+            if (pizza != null) {
+                if (json.has("name"))
+                    pizza.setName(json.get("name").asText());
+                if (json.has("pate")) {
+                    JsonNode pateNode = json.get("pate");
+                    if (pateNode.has("id") && pateNode.has("name")) {
+                        int pateId = pateNode.get("id").asInt();
+                        String pateName = pateNode.get("name").asText();
+                        pizza.setPate(new Pate(pateId, pateName));
+                    }
+                }
+                if (json.has("price"))
+                    pizza.setPrice(json.get("price").asDouble());
+                if (json.has("ingredients")) {
+                    List<Ingredient> ingredients = new ArrayList<>();
+                    JsonNode ingredientsNode = json.get("ingredients");
+                    for (JsonNode ingredientNode : ingredientsNode) {
+                        if (ingredientNode.has("id") && ingredientNode.has("name") && ingredientNode.has("price")) {
+                            int ingredientId = ingredientNode.get("id").asInt();
+                            String ingredientName = ingredientNode.get("name").asText();
+                            double ingredientPrice = ingredientNode.get("price").asDouble();
+                            ingredients.add(new Ingredient(ingredientId, ingredientName, ingredientPrice));
+                        }
+                    }
+                    pizza.setIngredients(ingredients);
+                }
+                int code = DAO.update(pizza);
+                if (code == 0)
+                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                else if (code == -1)
+                    res.setStatus(HttpServletResponse.SC_CONFLICT);
+                else
+                    res.setStatus(HttpServletResponse.SC_OK);
+            }
+            else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            else if (code == -1 || (newName == null && newPrice == null))
-                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            else
-                res.setStatus(HttpServletResponse.SC_OK);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -130,6 +130,15 @@ public class Pizza {
     }
 
     /**
+     * Modifie l'ID de la pizza.
+     *
+     * @param id La nouvelle L'ID de la pizza.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
      * Modifie le nom de la pizza.
      *
      * @param name Le nouveau nom de la pizza.
