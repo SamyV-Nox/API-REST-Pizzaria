@@ -33,7 +33,7 @@ public class PateDao extends Dao {
             ResultSet resultSet = statement.executeQuery(QUERY);
 
             if (resultSet.next()) {
-                res = new Pate(id, resultSet.getString("d_name"));
+                res = new Pate(id, resultSet.getString("d_nom"));
             }
         }
         return res;
@@ -57,7 +57,7 @@ public class PateDao extends Dao {
 
             while (resultSet.next()) {
                 dno = resultSet.getInt("dno");
-                name = resultSet.getString("d_name");
+                name = resultSet.getString("d_nom");
                 pates.add(new Pate(dno, name));
             }
         }
@@ -71,7 +71,7 @@ public class PateDao extends Dao {
      * @return true si l'enregistrement est réussi, false sinon.
      */
     public boolean save(Pate pate) {
-        final String QUERY = "INSERT INTO pates (d_name) VALUES (?)";
+        final String QUERY = "INSERT INTO pates (d_nom) VALUES (?)";
         
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ps.setString(1, pate.getName());
@@ -90,7 +90,7 @@ public class PateDao extends Dao {
      * @return Le nombre de lignes affectées par la mise à jour.
      */
     public int update(Pate pate) {
-        final String QUERY = "UPDATE pates SET d_name = ? WHERE dno = ?";
+        final String QUERY = "UPDATE pates SET d_nom = ? WHERE dno = ?";
         
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ps.setString(1, pate.getName());

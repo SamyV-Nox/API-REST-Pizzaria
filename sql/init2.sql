@@ -1,17 +1,17 @@
 
-DROP TABLE IF EXISTS recettes CASCADE;
-DROP TABLE IF EXISTS ingredients CASCADE;
-DROP TABLE IF EXISTS pizzas CASCADE;
+DROP TABLE IF EXISTS recettes;
+DROP TABLE IF EXISTS ingredients;
+DROP TABLE IF EXISTS pizzas;
 DROP TABLE IF EXISTS pates;
 
 -- PATES
 
 CREATE TABLE pates(
     dno SERIAL PRIMARY KEY,
-    d_name VARCHAR(20) NOT NULL
+    d_nom VARCHAR(20) NOT NULL
 );
 
-INSERT INTO pates (d_name) VALUES 
+INSERT INTO pates (d_nom) VALUES 
 ('Classique'),
 ('Fine'),
 ('Épaisse'),
