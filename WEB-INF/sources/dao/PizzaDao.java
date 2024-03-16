@@ -66,8 +66,8 @@ public class PizzaDao extends Dao {
 
         final String QUERY = "SELECT * FROM pizzas LEFT JOIN pates USING(dno) LEFT JOIN recettes USING(pno) LEFT JOIN ingredients USING(ino) ORDER BY pno, ino;";
 
-
-        try (PreparedStatement ps = con.prepareStatement(QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement ps = con.prepareStatement(QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
@@ -115,39 +115,55 @@ public class PizzaDao extends Dao {
         return pno;
     }
 
-    public static void main(String[] args) throws SQLException {
-        PizzaDao pd = new PizzaDao();
-        System.out.println(pd.findAll());
-    }
-
-    public int update(Pizza pizza) {
+    public int update(Pizza pizza) throws SQLException {
         final String QUERY = "UPDATE pizzas SET p_nom = ?, dno = ?, p_prix = ? WHERE pno = ?";
 
-        try (PreparedStatement updateStatement = con.prepareStatement(QUERY)) {
+        try (PreparedStatement ps = con.prepareStatement(QUERY)) {
 
             con.setAutoCommit(false); // Commencer une transaction
 
             deleteIngredient(pizza);
             saveIngredient(pizza);
 
-            updateStatement.setString(1, pizza.getName());
-            updateStatement.setInt(2, pizza.getPate().getId());
-            updateStatement.setDouble(3, pizza.getPrice());
-            updateStatement.setInt(4, pizza.getId());
-            int rowsAffected = updateStatement.executeUpdate();
+            ps.setString(1, pizza.getName());
+            ps.setInt(2, pizza.getPate().getId());
+            ps.setDouble(3, pizza.getPrice());
+            ps.setInt(4, pizza.getId());
+            int rowsAffected = ps.executeUpdate();
 
-            con.commit(); // Valider la transaction
-
-            con.setAutoCommit(true); // Retourner à l'autocommit par défaut
+            con.commit();
+            con.setAutoCommit(true);
 
             return rowsAffected;
         } catch (SQLException e) {
-            try {
-                con.rollback(); // Annuler la transaction en cas d'erreur
-                return -1;
-            } catch (SQLException rollbackException) {
-                return -1;
-            }        
+            con.rollback();
+            con.setAutoCommit(true);
+            throw e;
+        }
+    }
+
+    public void save(Pizza pizza) throws SQLException {
+        final String INSERT_PIZZA_QUERY = "INSERT INTO pizzas (p_nom, dno, p_prix) VALUES (?, ?, ?)";
+
+        try (PreparedStatement insertPizzaStatement = con.prepareStatement(INSERT_PIZZA_QUERY)) {
+
+            con.setAutoCommit(false);
+
+            // Insérer la pizza dans la table 'pizzas'
+            insertPizzaStatement.setString(1, pizza.getName());
+            insertPizzaStatement.setInt(2, pizza.getPate().getId());
+            insertPizzaStatement.setDouble(3, pizza.getPrice());
+            insertPizzaStatement.executeUpdate();
+
+            int id = findIdByName(pizza.getName());
+            pizza.setId(id);
+            saveIngredient(pizza);
+            con.commit();
+            con.setAutoCommit(true);
+        } catch (SQLException e) {
+            con.rollback();
+            con.setAutoCommit(true);
+            throw e;
         }
     }
 
@@ -171,10 +187,6 @@ public class PizzaDao extends Dao {
             }
             ps.executeBatch();
         }
-    }
-
-    public void save(Pizza ingredient) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     public int delete(int id) throws SQLException {

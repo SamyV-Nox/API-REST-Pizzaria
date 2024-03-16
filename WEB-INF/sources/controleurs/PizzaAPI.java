@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dao.PizzaDao;
 import dto.Ingredient;
@@ -152,8 +153,7 @@ public class PizzaAPI extends API {
                     res.setStatus(HttpServletResponse.SC_CONFLICT);
                 else
                     res.setStatus(HttpServletResponse.SC_OK);
-            }
-            else {
+            } else {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
 
@@ -168,7 +168,20 @@ public class PizzaAPI extends API {
         String[] parameter = getParametre(req);
 
         if (parameter.length == 0) {
-            
+
+            try {
+                String requestBody = req.getReader().lines().reduce("", String::concat);
+                ObjectMapper objectMapper = new ObjectMapper();
+                Pizza newPizza = objectMapper.readValue(requestBody, Pizza.class);
+
+                PizzaDao pizzaDao = new PizzaDao();
+                pizzaDao.save(newPizza);
+
+                res.setStatus(HttpServletResponse.SC_CREATED); 
+            } catch (IOException | SQLException e) {
+                e.printStackTrace();
+                res.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
         } else if (parameter.length == 3) {
 
             int pno = isNumber(parameter[1]);
