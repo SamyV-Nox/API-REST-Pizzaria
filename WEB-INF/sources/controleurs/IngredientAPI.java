@@ -44,16 +44,16 @@ public class IngredientAPI extends API {
         Ingredient ingredient = getById(res, id);
         if (ingredient != null) {
             String attribut = parameter[2];
-            if ("name".equals(attribut))
+            if ("nom".equals(attribut))
                 send(res, ingredient.getName());
-            else if ("price".equals(attribut))
+            else if ("prix".equals(attribut))
                 send(res, ingredient.getPrice());
             else if ("id".equals(attribut))
                 send(res, ingredient.getId());
             else
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

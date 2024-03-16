@@ -8,6 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import dao.PateDao;
+import dto.Ingredient;
 import dto.Pate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,23 +24,34 @@ public class PateAPI extends API {
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String[] parameter = getParametre(req);
 
-        if (parameter.length == 0)
+        final int NOMBRE_DE_PARAMTRE = parameter.length;
+        if (NOMBRE_DE_PARAMTRE == 0) {
             send(res, getAll(res));
-        else if (1 <= parameter.length) {
+        } else if (1 <= NOMBRE_DE_PARAMTRE) {
             int id = isNumber(parameter[1]);
             if (id == -1)
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            else if (parameter.length == 2) 
+            else if (NOMBRE_DE_PARAMTRE == 2)
                 send(res, getById(res, id));
-            else if (parameter.length == 3 && parameter[2].equals("id"))
-                send(res, getById(res, id).getId());
-            else if (parameter.length == 3 && parameter[2].equals("name"))
-                send(res, getById(res, id).getName());
-            else
-                res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            else if (NOMBRE_DE_PARAMTRE == 3) {
+                get3parametre(res, parameter, id);
+            } else
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 
+    private void get3parametre(HttpServletResponse res, String[] parameter, int id) {
+        Pate ingredient = getById(res, id);
+        if (ingredient != null) {
+            String attribut = parameter[2];
+            if ("nom".equals(attribut))
+                send(res, ingredient.getName());
+            else if ("id".equals(attribut))
+                send(res, ingredient.getId());
+            else
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

@@ -59,7 +59,7 @@ public class PizzaAPI extends API {
             else
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -120,8 +120,8 @@ public class PizzaAPI extends API {
             JsonNode jsonName = json.get("name");
             JsonNode jsonPrice = json.get("price");
 
-            String newName = (jsonName != null)? jsonName.asText() : null ;
-            Double newPrice = (jsonPrice != null)? jsonPrice.asDouble() : null ;
+            String newName = (jsonName != null) ? jsonName.asText() : null;
+            Double newPrice = (jsonPrice != null) ? jsonPrice.asDouble() : null;
 
             if (newName != null)
                 pizza.setName(newName);
@@ -157,28 +157,50 @@ public class PizzaAPI extends API {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse res) {
         String[] parameter = getParametre(req);
-        if (2 == parameter.length) {
-            int id = isNumber(parameter[1]);
+        if (parameter.length == 2) {
+            int pno = isNumber(parameter[1]);
 
-            if (id != -1) {
-                delete(res, id);
+            if (pno != -1) {
+                delete(res, pno);
+            } else {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } else if (parameter.length == 3) {
+
+            int pno = isNumber(parameter[1]);
+            int ino = isNumber(parameter[2]);
+
+            if (pno != -1 && ino != -1) {
+                deleteIngredient(res, pno, ino);
             } else {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
     }
 
+    private void deleteIngredient(HttpServletResponse res, int pno, int ino) {
+        try {
+            int code = DAO.deleteIngredient(pno, ino);
+            if (0 < code)
+                res.setStatus(HttpServletResponse.SC_OK);
+            else
+                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (Exception e) {
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+        }
+    }
+
     private void delete(HttpServletResponse res, int id) {
         try {
             int code = DAO.delete(id);
-            if (code == 0)
-                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            else if (code == -1)
-                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (0 < code)
+                res.setStatus(HttpServletResponse.SC_OK);
             else
-                res.setStatus(HttpServletResponse.SC_CREATED);
+                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
         }
     }
 }

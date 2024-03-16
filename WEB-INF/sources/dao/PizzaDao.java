@@ -1,5 +1,6 @@
 package dao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -56,49 +57,48 @@ public class PizzaDao extends Dao {
                     pizza.add(ingredient);
                 }
             }
-
-        } 
+        }
         return pizza;
     }
 
     public List<Pizza> findAll() throws SQLException {
-    List<Pizza> pizzas = new ArrayList<>();
+        List<Pizza> pizzas = new ArrayList<>();
 
-    final String QUERY = "SELECT * FROM pizzas LEFT JOIN pates USING(dno) LEFT JOIN recettes USING(pno) LEFT JOIN ingredients USING(ino);";
+        final String QUERY = "SELECT * FROM pizzas LEFT JOIN pates USING(dno) LEFT JOIN recettes USING(pno) LEFT JOIN ingredients USING(ino);";
 
-    try (Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-        ResultSet resultSet = statement.executeQuery(QUERY);
+        try (Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            ResultSet resultSet = statement.executeQuery(QUERY);
 
-        while (resultSet.next()) {
-            // Pates
-            int dno = resultSet.getInt("dno");
-            String d_nom = resultSet.getString("d_nom");
-            Pate pate = new Pate(dno, d_nom);
-            // Pizzas
-            int pno = resultSet.getInt("pno");
-            String p_nom = resultSet.getString("p_nom");
-            Double p_prix = resultSet.getDouble("p_prix");
-            Pizza pizza = new Pizza(pno, p_nom, pate, p_prix);
-            // Ingredients
-            int ino = resultSet.getInt("ino");
-            String i_nom = resultSet.getString("i_nom");
-            Double i_prix = resultSet.getDouble("i_prix");
-            Ingredient ingredient = new Ingredient(ino, i_nom, i_prix);
-            pizza.add(ingredient);
-
-            while (resultSet.next() && resultSet.getInt("pno") == pno) {
-                ino = resultSet.getInt("ino");
-                i_nom = resultSet.getString("i_nom");
-                i_prix = resultSet.getDouble("i_prix");
-                ingredient = new Ingredient(ino, i_nom, i_prix);
+            while (resultSet.next()) {
+                // Pates
+                int dno = resultSet.getInt("dno");
+                String d_nom = resultSet.getString("d_nom");
+                Pate pate = new Pate(dno, d_nom);
+                // Pizzas
+                int pno = resultSet.getInt("pno");
+                String p_nom = resultSet.getString("p_nom");
+                Double p_prix = resultSet.getDouble("p_prix");
+                Pizza pizza = new Pizza(pno, p_nom, pate, p_prix);
+                // Ingredients
+                int ino = resultSet.getInt("ino");
+                String i_nom = resultSet.getString("i_nom");
+                Double i_prix = resultSet.getDouble("i_prix");
+                Ingredient ingredient = new Ingredient(ino, i_nom, i_prix);
                 pizza.add(ingredient);
+
+                while (resultSet.next() && resultSet.getInt("pno") == pno) {
+                    ino = resultSet.getInt("ino");
+                    i_nom = resultSet.getString("i_nom");
+                    i_prix = resultSet.getDouble("i_prix");
+                    ingredient = new Ingredient(ino, i_nom, i_prix);
+                    pizza.add(ingredient);
+                }
+                resultSet.previous();
+                pizzas.add(pizza);
             }
-            resultSet.previous();
-            pizzas.add(pizza);
         }
+        return pizzas;
     }
-    return pizzas;
-}
 
     public static void main(String[] args) throws SQLException {
         PizzaDao pd = new PizzaDao();
@@ -113,7 +113,20 @@ public class PizzaDao extends Dao {
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
-    public int delete(int id) {
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    public int delete(int id) throws SQLException {
+        final String QUERY = "DELETE FROM pizzas WHERE pno = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
+            preparedStatement.setInt(1, id);
+            return preparedStatement.executeUpdate();
+        }
+    }
+
+    public int deleteIngredient(int pno, int ino) throws SQLException {
+        final String QUERY = "DELETE FROM recettes WHERE pno = ? AND ino = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
+            preparedStatement.setInt(1, pno);
+            preparedStatement.setInt(2, ino);
+            return preparedStatement.executeUpdate();
+        }
     }
 }
