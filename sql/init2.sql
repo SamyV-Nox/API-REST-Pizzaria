@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS panier, commandes, recettes, ingredients, pizzas, pates;
+DROP TABLE IF EXISTS panier, commandes, recettes, ingredients, pizzas, pates, tokens;
 
 -- PATES
 
@@ -52,6 +52,13 @@ CREATE TABLE panier (
     FOREIGN KEY (pno) REFERENCES pizzas(pno) ON DELETE CASCADE
 );
 
+
+CREATE TABLE tokens (
+    user_name VARCHAR(25),
+    password VARCHAR(25),
+
+    PRIMARY KEY (user_name, password)
+);
 
 INSERT INTO pates (d_nom) VALUES 
 ('Classique'),
@@ -184,3 +191,7 @@ INSERT INTO panier (cno, pno) VALUES
     (7, 7),
     -- Commande 8
     (8, 8);
+
+INSERT INTO tokens (user_name, password) VALUES 
+('admin', 'admin');
+

@@ -170,7 +170,6 @@ public class CommandeDao extends Dao {
     }
 
     public static void main(String[] args) {
-        // Création de quelques pizzas pour la commande
         Pate pate = new Pate(1, "Classique");
         List<Ingredient> ingredients = new ArrayList<>();
         ingredients.add(new Ingredient(1, "Sauce tomate", 1.5));
@@ -189,9 +188,8 @@ public class CommandeDao extends Dao {
         try {
             // Sauvegarde de la commande
             commandeDAO.saveCommande(commande);
-            System.out.println("Commande sauvegardée avec succès !");
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la sauvegarde de la commande : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
