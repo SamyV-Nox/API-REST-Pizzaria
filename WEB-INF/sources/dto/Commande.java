@@ -1,10 +1,7 @@
 package dto;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Cette classe représente une commande de pizzas.
@@ -16,64 +13,25 @@ public class Commande {
     private int cno;
 
     private String name;
-    
-    private LocalDateTime orderDate;
 
-    private List<Pizza> orderedPizzas;
+    private LocalDate date;
 
-    private static final String DEFAULT_USER_NAME = "NO_NAME";
+    private List<Pizza> panier;
 
     /**
      * Constructeur de la classe Commande.
      * 
-     * @param id L'identifiant de la commande.
-     * @param userName Le nom de l'utilisateur qui a passé la commande.
-     * @param orderDate La date et l'heure de la commande.
-     * @param orderedPizzas La liste des pizzas commandées.
+     * @param id            L'identifiant de la commande.
+     * @param userName      Le nom de l'utilisateur qui a passé la commande.
+     * @param date     La date de la commande.
+     * @param panier La liste des pizzas commandées.
      */
-    public Commande(int id, String userName, LocalDateTime orderDate, List<Pizza> orderedPizzas) {
+    public Commande(int id, String name, LocalDate date, List<Pizza> panier) {
         this.cno = id;
-        this.name = userName;
-        this.orderDate = orderDate;
-        this.orderedPizzas = orderedPizzas;
+        this.name = name;
+        this.date = date;
+        this.panier = panier;
     }
-
-    /**
-     * Constructeur de la classe Commande.
-     * Crée une nouvelle commande avec l'identifiant spécifié, le nom de l'utilisateur, la liste des pizzas commandées,
-     * et la date de commande actuelle.
-     * 
-     * @param id L'identifiant de la commande.
-     * @param nomUtilisateur Le nom de l'utilisateur qui a passé la commande.
-     * @param pizzasCommandees La liste des pizzas commandées.
-     */
-    public Commande(int id, String userName, List<Pizza> orderedPizzas) {
-        this(id, userName, LocalDateTime.now(), orderedPizzas);
-    }
-
-    /**
-     * Constructeur de la classe Commande.
-     * Crée une nouvelle commande avec l'identifiant spécifié, un nom d'utilisateur par défaut, la liste des pizzas commandées,
-     * et la date de commande actuelle.
-     * 
-     * @param id L'identifiant de la commande.
-     * @param pizzasCommandees La liste des pizzas commandées.
-     */
-    public Commande(int id, List<Pizza> orderedPizzas) {
-        this(id, DEFAULT_USER_NAME, orderedPizzas);
-    }
-
-    /**
-     * Constructeur de la classe Commande.
-     * Crée une nouvelle commande avec l'identifiant spécifié, un nom d'utilisateur par défaut, la liste des pizzas commandées,
-     * et la date de commande actuelle.
-     * 
-     * @param id L'identifiant de la commande.
-     */
-    public Commande(int id) {
-        this(id, DEFAULT_USER_NAME, new ArrayList<>());
-    }
-
 
     /**
      * Retourne l'identifiant de la commande.
@@ -116,8 +74,8 @@ public class Commande {
      * 
      * @return La date et l'heure de la commande.
      */
-    public LocalDateTime getOrderDate() {
-        return orderDate;
+    public LocalDate getDate() {
+        return date;
     }
 
     /**
@@ -125,8 +83,8 @@ public class Commande {
      * 
      * @param orderDate La date et l'heure de la commande.
      */
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
+    public void setDate(LocalDate orderDate) {
+        this.date = orderDate;
     }
 
     /**
@@ -134,8 +92,8 @@ public class Commande {
      * 
      * @return La liste des pizzas commandées.
      */
-    public List<Pizza> getOrderedPizzas() {
-        return orderedPizzas;
+    public List<Pizza> getPanier() {
+        return panier;
     }
 
     /**
@@ -143,8 +101,8 @@ public class Commande {
      * 
      * @param orderedPizzas La liste des pizzas commandées.
      */
-    public void setOrderedPizzas(List<Pizza> orderedPizzas) {
-        this.orderedPizzas = orderedPizzas;
+    public void setPanier(List<Pizza> orderedPizzas) {
+        this.panier = orderedPizzas;
     }
 
     /**
@@ -152,9 +110,9 @@ public class Commande {
      * 
      * @return Le prix total de la commande.
      */
-    public double calculateTotalPrice() {
+    public double getFinalPrice() {
         double totalPrice = 0;
-        for (Pizza pizza : orderedPizzas) {
+        for (Pizza pizza : panier) {
             totalPrice += pizza.getFinalPrice();
         }
         return totalPrice;
@@ -170,8 +128,8 @@ public class Commande {
         return "Command{" +
                 "id=" + cno +
                 ", userName='" + name + '\'' +
-                ", orderDate=" + orderDate +
-                ", orderedPizzas=" + orderedPizzas +
+                ", orderDate=" + date +
+                ", orderedPizzas=" + panier +
                 '}';
     }
 
@@ -192,10 +150,7 @@ public class Commande {
         if (getClass() != obj.getClass())
             return false;
         Commande other = (Commande) obj;
-        if (cno != other.cno)
-            return false;
-        return true;
+        return cno != other.cno;
     }
 
-    
 }

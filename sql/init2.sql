@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS commande_pizza, commandes, recettes, ingredients, pizzas, pates;
+DROP TABLE IF EXISTS panier, commandes, recettes, ingredients, pizzas, pates;
 
 -- PATES
 
@@ -44,11 +44,11 @@ CREATE TABLE commandes (
 );
 
 -- COMMANDES / PIZZA
-CREATE TABLE commande_pizza (
-    con INT,
+CREATE TABLE panier (
+    cno INT,
     pno INT,
-    PRIMARY KEY (con, pno),
-    FOREIGN KEY (con) REFERENCES commandes(cno) ON DELETE CASCADE,
+    PRIMARY KEY (cno, pno),
+    FOREIGN KEY (cno) REFERENCES commandes(cno) ON DELETE CASCADE,
     FOREIGN KEY (pno) REFERENCES pizzas(pno) ON DELETE CASCADE
 );
 
@@ -154,3 +154,32 @@ INSERT INTO recettes(pno, ino) VALUES
 (10, 18), -- Gorgonzola
 (10, 19), -- Chèvre
 (10, 20); -- Parmesan
+
+INSERT INTO commandes (c_name, c_orderDate) 
+VALUES
+    ('Commande 1', '2023-06-01'),
+    ('Commande 2', '2023-06-02'),
+    ('Commande 3', '2023-06-03'),
+    ('Commande 4', '2023-06-04'),
+    ('Commande 5', '2023-06-05'),
+    ('Commande 6', '2023-06-06'),
+    ('Commande 7', '2023-06-07'),
+    ('Commande 8', '2023-06-08');
+
+INSERT INTO panier (cno, pno) VALUES 
+    -- Commande 1
+    (1, 1),
+    -- Commande 2
+    (2, 2),
+    -- Commande 3
+    (3, 3),
+    -- Commande 4
+    (4, 4),
+    -- Commande 5
+    (5, 5),
+    -- Commande 6
+    (6, 6),
+    -- Commande 7
+    (7, 7),
+    -- Commande 8
+    (8, 8);

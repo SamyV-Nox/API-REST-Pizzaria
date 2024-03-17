@@ -3,6 +3,7 @@ package controleurs;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,9 +12,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public abstract class API extends HttpServlet {
 
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    protected static final ObjectMapper OBJECT_MAPPER;
     protected static final String CONTENT_TYPE = "application/json";
     protected static final String CHARACTER_ENCODING = "UTF-8";
+
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+    }
 
     public void formatResponse(HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
@@ -63,5 +69,4 @@ public abstract class API extends HttpServlet {
 
     protected void doPatch(HttpServletRequest req, HttpServletResponse res) {
     }
-
 }
