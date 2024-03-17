@@ -169,6 +169,7 @@ VALUES
 INSERT INTO panier (cno, pno) VALUES 
     -- Commande 1
     (1, 1),
+    (1, 2),
     -- Commande 2
     (2, 2),
     -- Commande 3
