@@ -7,11 +7,16 @@ meta {
 post {
   url: http://localhost:8080/api/pizzas/
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: admin/admin
 }
 
 body:json {
   {
+    "name": "test",
     "pate": {
       "id": 1
     },

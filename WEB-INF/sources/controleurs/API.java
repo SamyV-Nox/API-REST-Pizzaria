@@ -1,7 +1,6 @@
 package controleurs;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,7 +18,7 @@ public abstract class API extends HttpServlet {
     protected static final String CHARACTER_ENCODING = "UTF-8";
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String TOKEN_PREFIX = "Bearer ";
-    private static final APITokenDao DAO = new APITokenDao(); 
+    public static final APITokenDao DAO = new APITokenDao(); 
 
     static {
         OBJECT_MAPPER = new ObjectMapper();

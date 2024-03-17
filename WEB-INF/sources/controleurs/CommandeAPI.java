@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 import dao.CommandeDao;
 import dao.PizzaDao;
-import dto.Commande;
+import dto.TOKEN;
 import dto.Pizza;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -48,9 +48,9 @@ public class CommandeAPI extends API {
         }
     }
 
-    private List<Commande> getAll(HttpServletResponse res) {
+    private List<TOKEN> getAll(HttpServletResponse res) {
         try {
-            List<Commande> commande = DAO.findAll();
+            List<TOKEN> commande = DAO.findAll();
             if (!commande.isEmpty()) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return commande;
@@ -66,7 +66,7 @@ public class CommandeAPI extends API {
     }
 
     private void get3parametre(HttpServletResponse res, String[] parameter, int id) {
-        Commande ingredient = getById(res, id);
+        TOKEN ingredient = getById(res, id);
         if (ingredient != null) {
             String attribut = parameter[2];
             if ("id".equals(attribut))
@@ -86,9 +86,9 @@ public class CommandeAPI extends API {
         }
     }
 
-     private Commande getById(HttpServletResponse res, int id) {
+     private TOKEN getById(HttpServletResponse res, int id) {
         try {
-            Commande ingredient = DAO.findById(id);
+            TOKEN ingredient = DAO.findById(id);
             if (ingredient != null) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return ingredient;
@@ -138,7 +138,7 @@ public class CommandeAPI extends API {
                 }
 
                 // Création de la commande
-                Commande commande = new Commande(0, name, date, orderedPizzas);
+                TOKEN commande = new TOKEN(0, name, date, orderedPizzas);
 
                 // Sauvegarde de la commande dans la base de données
                 DAO.saveCommande(commande);

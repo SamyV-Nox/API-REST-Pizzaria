@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: http://localhost:8080/api/pizzas/1/ingredients
+  url: http://localhost:8080/api/pizzas/1/prix
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: admin/admin
 }

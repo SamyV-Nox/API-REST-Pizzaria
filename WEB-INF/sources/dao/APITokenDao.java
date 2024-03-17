@@ -3,8 +3,13 @@ package dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import controleurs.TokenAPI;
 import dto.APIToken;
+import dto.Ingredient;
+import dto.TOKEN;
 
 public class APITokenDao extends Dao{
 
@@ -20,5 +25,21 @@ public class APITokenDao extends Dao{
                 res = new APIToken(resultSet.getString("user_name"), resultSet.getString("password"));
         }
         return res;
+    }
+
+    public List<APIToken> findAll() throws SQLException {
+        List<APIToken> res = new ArrayList<>();
+
+        try (PreparedStatement ps = con.prepareStatement("SELECT * FROM tokens;")) {
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next()) 
+                res.add(new APIToken(resultSet.getString("user_name"), resultSet.getString("password")));
+        }
+        return res;
+    }
+
+    public static void main(String[] args) throws SQLException {
+        System.out.println(new APITokenDao().findAll());
     }
 }
