@@ -1,8 +1,4 @@
-
-DROP TABLE IF EXISTS recettes;
-DROP TABLE IF EXISTS ingredients;
-DROP TABLE IF EXISTS pizzas;
-DROP TABLE IF EXISTS pates;
+DROP TABLE IF EXISTS commande_pizza, commandes, recettes, ingredients, pizzas, pates;
 
 -- PATES
 
@@ -11,13 +7,6 @@ CREATE TABLE pates(
     d_nom VARCHAR(20) UNIQUE NOT NULL
 );
 
-INSERT INTO pates (d_nom) VALUES 
-('Classique'),
-('Fine'),
-('Épaisse'),
-('Blé entier'),
-('Sans gluten');
-
 -- INGREDIENTS
 
 CREATE TABLE ingredients(
@@ -25,6 +14,51 @@ CREATE TABLE ingredients(
     i_nom VARCHAR(20) UNIQUE NOT NULL,
     i_prix FLOAT  NOT NULL
 );
+
+-- PIZZAS
+
+CREATE TABLE pizzas(
+    pno SERIAL PRIMARY KEY,
+    p_nom VARCHAR(20) UNIQUE NOT NULL,
+    dno INT DEFAULT 1,
+    p_prix FLOAT NOT NULL,
+
+    FOREIGN KEY (dno) references pates(dno) ON DELETE CASCADE
+);
+
+-- PIZZAS / INGREDIENTS
+CREATE TABLE recettes(
+    pno INT,
+    ino INT,
+
+    PRIMARY KEY (pno, ino),
+    FOREIGN KEY (pno) references pizzas(pno) ON DELETE CASCADE,
+    FOREIGN KEY (ino) references ingredients(ino) ON DELETE CASCADE
+);
+
+-- COMMANDES
+CREATE TABLE commandes (
+    cno SERIAL PRIMARY KEY,
+    c_name VARCHAR(255),
+    c_orderDate DATE DEFAULT NOW()
+);
+
+-- COMMANDES / PIZZA
+CREATE TABLE commande_pizza (
+    con INT,
+    pno INT,
+    PRIMARY KEY (con, pno),
+    FOREIGN KEY (con) REFERENCES commandes(cno) ON DELETE CASCADE,
+    FOREIGN KEY (pno) REFERENCES pizzas(pno) ON DELETE CASCADE
+);
+
+
+INSERT INTO pates (d_nom) VALUES 
+('Classique'),
+('Fine'),
+('Épaisse'),
+('Blé entier'),
+('Sans gluten');
 
 INSERT INTO ingredients(i_nom, i_prix) VALUES
 ('Sauce tomate', 1.50),
@@ -48,17 +82,6 @@ INSERT INTO ingredients(i_nom, i_prix) VALUES
 ('Chèvre', 2.50),
 ('Parmesan', 2.00);
 
--- PIZZA
-
-CREATE TABLE pizzas(
-    pno SERIAL PRIMARY KEY,
-    p_nom VARCHAR(20) UNIQUE NOT NULL,
-    dno INT DEFAULT 1,
-    p_prix FLOAT NOT NULL,
-
-    FOREIGN KEY (dno) references pates(dno) ON DELETE CASCADE
-);
-
 INSERT INTO pizzas(p_nom, dno, p_prix) VALUES 
 ('Margherita', 1, 8.99),        
 ('Quattro Stagioni', 2, 10.99), 
@@ -71,21 +94,9 @@ INSERT INTO pizzas(p_nom, dno, p_prix) VALUES
 ('Fromage de chèvre', 4, 12.99),
 ('Quatre fromages', 5, 13.49);
 
--- PIZZAS / INGREDIENTS
 
-CREATE TABLE recettes(
-    pno INT,
-    ino INT,
-
-    PRIMARY KEY (pno, ino),
-    FOREIGN KEY (pno) references pizzas(pno) ON DELETE CASCADE,
-    FOREIGN KEY (ino) references ingredients(ino) ON DELETE CASCADE
-);
-
--- Associer les ingrédients avec les pizzas
-
--- Margherita
 INSERT INTO recettes(pno, ino) VALUES 
+-- Margherita
 (1, 1), -- Sauce tomate
 (1, 2), -- Mozzarella
 -- Quattro Stagioni

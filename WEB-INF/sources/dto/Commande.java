@@ -13,16 +13,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Commande {
 
-    @JsonProperty("cno")
     private int cno;
 
-    @JsonProperty("name")
     private String name;
     
-    @JsonProperty("orderDate")
     private LocalDateTime orderDate;
 
-    @JsonProperty("orderedPizzas")
     private List<Pizza> orderedPizzas;
 
     private static final String DEFAULT_USER_NAME = "NO_NAME";
