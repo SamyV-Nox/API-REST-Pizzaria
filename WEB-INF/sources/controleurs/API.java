@@ -68,8 +68,13 @@ public abstract class API extends HttpServlet {
                 }
             }
             else {
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                send(res, "Unauthorized");
+                if (req.getMethod().equalsIgnoreCase("GET")) {
+                    doGet(req, res);
+                }
+                else {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    send(res, "Unauthorized");
+                }
             }
         } catch (ServletException | IOException e) {
             e.printStackTrace();

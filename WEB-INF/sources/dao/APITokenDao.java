@@ -6,10 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import controleurs.TokenAPI;
 import dto.APIToken;
-import dto.Ingredient;
-import dto.Commande;
 
 public class APITokenDao extends Dao{
 
