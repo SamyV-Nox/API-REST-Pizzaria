@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import dto.TOKEN;
+import dto.Commande;
 import dto.Ingredient;
 import dto.Pate;
 import dto.Pizza;
@@ -19,8 +19,8 @@ public class CommandeDao extends Dao {
 
     
 
-    public TOKEN findById(int id) throws SQLException {
-        TOKEN commande = null;
+    public Commande findById(int id) throws SQLException {
+        Commande commande = null;
 
         final String QUERY = "SELECT * " +
                 "FROM commandes " +
@@ -41,7 +41,7 @@ public class CommandeDao extends Dao {
                 if (commande == null) {
                     String userName = resultSet.getString("c_name");
                     LocalDate orderDate = resultSet.getDate("c_orderDate").toLocalDate();
-                    commande = new TOKEN(id, userName, orderDate, new ArrayList<>());
+                    commande = new Commande(id, userName, orderDate, new ArrayList<>());
                 }
 
                 int pno = resultSet.getInt("pno");
@@ -70,8 +70,8 @@ public class CommandeDao extends Dao {
         return commande;
     }
 
-    public List<TOKEN> findAll() throws SQLException {
-        List<TOKEN> commandes = new ArrayList<>();
+    public List<Commande> findAll() throws SQLException {
+        List<Commande> commandes = new ArrayList<>();
 
         final String QUERY = "SELECT commandes.*, pizzas.*, pates.*, ingredients.* " +
                              "FROM commandes " +
@@ -85,14 +85,14 @@ public class CommandeDao extends Dao {
         try (PreparedStatement ps = con.prepareStatement(QUERY)) {
             ResultSet resultSet = ps.executeQuery();
 
-            Map<Integer, TOKEN> commandeMap = new HashMap<>();
+            Map<Integer, Commande> commandeMap = new HashMap<>();
             while (resultSet.next()) {
                 int cno = resultSet.getInt("cno");
-                TOKEN commande;
+                Commande commande;
                 if (!commandeMap.containsKey(cno)) {
                     String userName = resultSet.getString("c_name");
                     LocalDate orderDate = resultSet.getDate("c_orderDate").toLocalDate();
-                    commande = new TOKEN(cno, userName, orderDate, new ArrayList<>());
+                    commande = new Commande(cno, userName, orderDate, new ArrayList<>());
                     commandeMap.put(cno, commande);
                     commandes.add(commande);
                 } else {
@@ -125,7 +125,7 @@ public class CommandeDao extends Dao {
         return commandes;
     }
 
-    public void saveCommande(TOKEN commande) throws SQLException {
+    public void saveCommande(Commande commande) throws SQLException {
         final String COMMANDE_QUERY = "INSERT INTO commandes (c_name, c_orderDate) VALUES (?, ?)";
        
         con.setAutoCommit(false);
@@ -156,7 +156,7 @@ public class CommandeDao extends Dao {
         }
     }
 
-    private void savePanier(TOKEN commande, int cno) throws SQLException {
+    private void savePanier(Commande commande, int cno) throws SQLException {
         final String PANIER_QUERY = "INSERT INTO panier (cno, pno) VALUES (?, ?)";
         
         try (PreparedStatement psPanier = con.prepareStatement(PANIER_QUERY)) {  
@@ -181,7 +181,7 @@ public class CommandeDao extends Dao {
         pizzas.add(pizza1);
 
         // Création d'une commande avec les pizzas
-        TOKEN commande = new TOKEN(1, "John Doe", LocalDate.now(), pizzas);
+        Commande commande = new Commande(1, "John Doe", LocalDate.now(), pizzas);
 
         // Initialisation de la connexion à la base de données
         CommandeDao commandeDAO = new CommandeDao();
@@ -190,6 +190,35 @@ public class CommandeDao extends Dao {
             commandeDAO.saveCommande(commande);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public int delete(int cno) throws SQLException {
+        String query = "DELETE FROM commandes WHERE cno = ?";
+        
+        try (PreparedStatement statement = con.prepareStatement(query)) {
+            statement.setInt(1, cno);
+            return statement.executeUpdate();
+        }
+    }
+    
+    public int deletePizza(int cno, int pno) throws SQLException {
+        String query = "DELETE FROM panier WHERE cno = ? AND pno = ?";
+        
+        try (PreparedStatement statement = con.prepareStatement(query)) {
+            statement.setInt(1, cno);
+            statement.setInt(2, pno);
+            return statement.executeUpdate();
+        }
+    }
+
+    public void addPizza(int cno, int pno) throws SQLException {
+        String query = "INSERT INTO panier (cno, pno) VALUES (?, ?)";
+        
+        try (PreparedStatement statement = con.prepareStatement(query)) {
+            statement.setInt(1, cno);
+            statement.setInt(2, pno);
+            statement.executeUpdate();
         }
     }
 }

@@ -9,8 +9,8 @@
 - [Ingrédients](./doc/Ingredients.md)
 - [Pâtes](./doc/Pates.md)
 - [Pizza](./doc/Pizzas.md)
-- [Commande](./doc/Commande.md)
-- [Token](./doc/Token.md)
+- [Commande](./doc/Commandes.md)
+- [Token](./doc/Tokens.md)
 
 ## Information
 

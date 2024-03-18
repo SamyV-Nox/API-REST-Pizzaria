@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * @author samy.vancalster.etu@unvi-lille.fr
  */
-public class TOKEN {
+public class Commande {
 
     private int cno;
 
@@ -26,7 +26,7 @@ public class TOKEN {
      * @param date     La date de la commande.
      * @param panier La liste des pizzas commandées.
      */
-    public TOKEN(int id, String name, LocalDate date, List<Pizza> panier) {
+    public Commande(int id, String name, LocalDate date, List<Pizza> panier) {
         this.cno = id;
         this.name = name;
         this.date = date;
@@ -149,7 +149,7 @@ public class TOKEN {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TOKEN other = (TOKEN) obj;
+        Commande other = (Commande) obj;
         return cno != other.cno;
     }
 

@@ -11,7 +11,8 @@ Cette documentation décrit les différentes requêtes possibles pour interagir 
 | /commandes/{id}/{attribut}  |`GET`      |                 |L'attribut de la commande  |`HTTP 200 OK`, `HTTP 404 Not Found`       |
 | /commandes                  |`POST`     | Commande        |                           |`HTTP 201 Created`, `HTTP 400 Bad Request`|
 | /commandes/{id}/{attribut}  |`POST`     |                 |                           |`HTTP 201 Created`, `HTTP 400 Bad Request`, `HTTP 404 Not Found`|
-| /commandes/{id}/{attribut}  |`DELETE`   |                 |                           |`HTTP 200 OK`, `HTTP 400 Bad Request`, `HTTP 404 Not Found`       |
+| /commandes/{id}             |`DELETE`   |                 |                           |`HTTP 200 OK`, `HTTP 400 Bad Request`, `HTTP 404 Not Found`       |
+| /commandes/{id}/{attribut}  |`DELETE`   |                 |                           |`HTTP 200 OK`, `HTTP 400 Bad Request`, `HTTP 404 Not Found`, `409 Conflict`       |
 
 ## Méthodes d'appel
 
@@ -163,7 +164,7 @@ Exemple de retour :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` Si des commandes existent dans la base de donnés
+- `HTTP 200 OK` Si des commandes existent dans la base de donnés.
 - `HTTP 404 Not Found` Et une liste vide.
 
 ### Obtenir une commande par son ID
@@ -256,7 +257,7 @@ Exemple de retours :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` Si des commandes existent dans la base de
+- `HTTP 200 OK` Si des commandes existent dans la base de.
 - `HTTP 404 Not Found` Et une liste vide.
 
 ### Obtenir une propriété d'une commande par son ID
@@ -266,9 +267,9 @@ GET /commande/{id}/{attribute}
 ```
 
 Paramètres :
-- `{id}` : L'ID de la commandes à afficher
-- `{attribute}` : L'attribut à afficher
-    - `nom`, `date`, `panier`, `id`, `prixfinal`
+- `{id}` : L'ID de la commandes à afficher.
+- `{attribute}` : L'attribut à afficher.
+    - `nom`, `date`, `panier`, `id`, `prixfinal`.
 
 Exemple de retours :
 ```json
@@ -276,8 +277,8 @@ Exemple de retours :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` Si l'attribut a été trouvé
-- `HTTP 404 Not Found` Si la commandes n'a pas été trouvée
+- `HTTP 200 OK` Si l'attribut a été trouvé.
+- `HTTP 404 Not Found` Si la commandes n'a pas été trouvée.
 
 ## Requêtes POST
 
@@ -288,9 +289,9 @@ POST /commandes
 ```
 
 Paramètres requis :
-- `name` : Sous forme d'une chaîne de caractères (Le nom doit être unique dans la base de données)
-- `date` : Sous forme d'une chaîne de caractères
-- `panier` : Sous forme d'un tableau contenant les idées des pizza
+- `name` : Sous forme d'une chaîne de caractères (Le nom doit être unique dans la base de données).
+- `date` : Sous forme d'une chaîne de caractères.
+- `panier` : Sous forme d'un tableau contenant les idées des pizza.
 
 Exemple de body : 
 ```json
@@ -315,10 +316,51 @@ Cette requête renvoie un statut de réponse :
 - `HTTP 201 Created` : La nouvelle pâte a été sauvegarde dans la base de données et un ID lui est attribué.
 - `HTTP 400 Bad Request` : Erreur lors de la sauvegarde de la nouvelle pâte.
 
-### Ajouter une pizza dans une commande (bientôt)
+### Ajouter une pizza dans une commande (beta)
+
+```bash
+POST /commandes/{id}/{idPizza}
+```
+
+Paramètres :
+- `{id}` : L'ID de la commande où ajouter la pizza.
+- `{idPizza}` : L'ID de la pizza à ajouter de la commande.
+
+
+Cette requête renvoie un statut de réponse : 
+- `HTTP 200 OK` : La commande a été supprimée de la base de données.
+- `HTTP 400 Bad Request` : Erreur lors de la suppression de la commande, exemple l'ID n'est pas un nombre.
+- `HTTP 404 Not Found` : Aucune commande ayant cet ID n'a été trouvée dans la base de données.
+- `HTTP 409 Conflict` : La pizza a déjà été associée à la commande.
+
 
 ## Requêtes DELETE
 
-### Supprimer une commande (bientôt)
+### Supprimer une commande (beta)
 
-### Supprimer une pizza dans une commande (bientôt)
+```bash
+DELETE /commandes/{id}
+```
+Paramètres :
+- `{id}` : L'ID de la commande à supprimer
+
+Cette requête renvoie un statut de réponse : 
+- `HTTP 200 OK` : La commande a été supprimée de la base de données.
+- `HTTP 400 Bad Request` : Erreur lors de la suppression de la commande, exemple l'ID n'est pas un nombre.
+- `HTTP 404 Not Found` : Aucune commande ayant cet ID n'a été trouvée dans la base de données.
+
+### Supprimer une pizza dans une commande (beta)
+
+```bash
+DELETE /commandes/{id}/{idPizza}
+```
+
+Paramètres :
+- `{id}` : L'ID de la commande où supprimer la pizza
+- `{idPizza}` : L'ID de la pizza a supprimé de la commande
+
+
+Cette requête renvoie un statut de réponse : 
+- `HTTP 200 OK` : La commande a été supprimée de la base de données.
+- `HTTP 400 Bad Request` : Erreur lors de la suppression de la commande, exemple l'ID n'est pas un nombre.
+- `HTTP 404 Not Found` : Aucune commande ayant cet ID n'a été trouvée dans la base de données.

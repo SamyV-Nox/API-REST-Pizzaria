@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 import dao.CommandeDao;
 import dao.PizzaDao;
-import dto.TOKEN;
+import dto.Commande;
 import dto.Pizza;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,7 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CommandeAPI extends API {
     private static final CommandeDao DAO = new CommandeDao();
     private static final PizzaDao PIZZA_DAO = new PizzaDao();
-
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -48,9 +47,9 @@ public class CommandeAPI extends API {
         }
     }
 
-    private List<TOKEN> getAll(HttpServletResponse res) {
+    private List<Commande> getAll(HttpServletResponse res) {
         try {
-            List<TOKEN> commande = DAO.findAll();
+            List<Commande> commande = DAO.findAll();
             if (!commande.isEmpty()) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return commande;
@@ -66,7 +65,7 @@ public class CommandeAPI extends API {
     }
 
     private void get3parametre(HttpServletResponse res, String[] parameter, int id) {
-        TOKEN ingredient = getById(res, id);
+        Commande ingredient = getById(res, id);
         if (ingredient != null) {
             String attribut = parameter[2];
             if ("id".equals(attribut))
@@ -86,9 +85,9 @@ public class CommandeAPI extends API {
         }
     }
 
-     private TOKEN getById(HttpServletResponse res, int id) {
+    private Commande getById(HttpServletResponse res, int id) {
         try {
-            TOKEN ingredient = DAO.findById(id);
+            Commande ingredient = DAO.findById(id);
             if (ingredient != null) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return ingredient;
@@ -100,61 +99,115 @@ public class CommandeAPI extends API {
         return null;
     }
 
-     @Override
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String[] parameter = req.getPathInfo().split("/");
+
+        if (parameter.length == 2) {
+            post(req, res);
+        }
+        else if (parameter.length == 3) {
+            try {
+                int cno = Integer.parseInt(parameter[1]);
+                int pno = Integer.parseInt(parameter[2]);
+                DAO.addPizza(cno, pno);
+                res.setStatus(HttpServletResponse.SC_CREATED);
+            } catch (Exception e) {
+                res.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
+        } else {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    protected void post(HttpServletRequest req, HttpServletResponse res) {
         try {
-            // Lecture du corps de la requête
             BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
             String requestBody = reader.lines().collect(Collectors.joining());
 
-            // Conversion du corps de la requête en objet JSON
             JsonNode json = OBJECT_MAPPER.readTree(requestBody);
 
-            // Vérification si le JSON contient tous les attributs requis
             if (json.has("name") && json.has("date") && json.has("panier")) {
-                // Extraction des données du JSON
+
                 String name = json.get("name").asText();
                 LocalDate date = LocalDate.parse(json.get("date").asText());
 
-                // Extraction des pizzas de la commande
                 List<Pizza> orderedPizzas = new ArrayList<>();
                 JsonNode pizzasNode = json.get("panier");
                 if (pizzasNode.getNodeType() == JsonNodeType.ARRAY) {
                     for (JsonNode pizzaNode : pizzasNode) {
-                        int pno = pizzaNode.get("id").asInt(); // Supposons que l'identifiant de la pizza est "id"
-                        Pizza pizza = PIZZA_DAO.findById(pno); 
+                        int pno = pizzaNode.get("id").asInt(); 
+                        Pizza pizza = PIZZA_DAO.findById(pno);
                         if (pizza != null) {
                             orderedPizzas.add(pizza);
                         } else {
-                            // Si une pizza n'est pas trouvée, retourner une erreur
                             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                             return;
                         }
                     }
                 } else {
-                    // Si la liste de pizzas n'est pas un tableau JSON, retourner une erreur
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
 
-                // Création de la commande
-                TOKEN commande = new TOKEN(0, name, date, orderedPizzas);
+                Commande commande = new Commande(0, name, date, orderedPizzas);
 
-                // Sauvegarde de la commande dans la base de données
                 DAO.saveCommande(commande);
 
-                // Réponse avec le statut 201 (Created)
                 res.setStatus(HttpServletResponse.SC_CREATED);
             } else {
-                // Si certains attributs sont manquants dans le JSON, retourner une erreur
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (Exception e) {
-            // En cas d'erreur lors de l'accès à la base de données, retourner une erreur 500 (Internal Server Error)
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
         }
     }
-
     
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String[] parameter = req.getPathInfo().split("/");
+
+        if (parameter.length == 2) {
+            try {
+                int cno = Integer.parseInt(parameter[1]);
+                int code = DAO.delete(cno);
+                if (code == 0) {
+                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                }
+                else if (code > 0) {
+                    res.setStatus(HttpServletResponse.SC_OK);
+                }
+                res.setStatus(HttpServletResponse.SC_OK);
+                
+            } catch (SQLException e) {
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } else if (parameter.length == 3) {
+
+            try {
+
+                int cno = Integer.parseInt(parameter[1]);
+                int pno = Integer.parseInt(parameter[2]);
+                int code = DAO.deletePizza(cno, pno);
+                if (code == 0) {
+                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                }
+                else if (code > 0) {
+                    res.setStatus(HttpServletResponse.SC_OK);
+                }
+            } catch (SQLException e) {
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } else {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 }

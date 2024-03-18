@@ -1,1 +1,0 @@
-SELECT * FROM commandes LEFT JOIN contientpizza using (cno) LEFT JOIN pizzas using(pno) WHERE cno = 1;
