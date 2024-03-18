@@ -15,7 +15,36 @@ Cette documentation décrit les requêtes possibles et les retours attendus de l
 
 ## Méthodes d'appel
 
-La classe `IngredientAPI` étend la classe abstraite `API` et définit six méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
+La classe `IngredientAPI` étend la classe abstraite `API` et définit quatres méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
+
+## Corps des requêtes
+
+### I1
+
+Un ingrédient est constitué d'un identifiant, d'un nom et d'un prix.
+
+Voici sa représentation JSON :
+
+```JSON
+{
+  "id": 21,
+  "name": "Parmesan",
+  "price": 2
+}
+```
+
+### I2
+
+Pour la création d'un ingrédient, on a juste besoin de son nom et de son prix car l'id est généré automatiquement.
+
+Voici sa représentation JSON :
+```JSON
+{
+  "name": "Parmesan",
+  "price": 2
+}
+```
+
 
 ## Requêtes GET
 
@@ -26,7 +55,7 @@ GET /ingredients
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` Si des ingrédients existent dans la base de
+- `HTTP 200 OK` Si des ingrédients existent dans la base de données
 - `HTTP 404 Not Found` Et une liste vide.
 
 Exemple de retour : 
@@ -63,7 +92,7 @@ Exemple de retours :
 
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` Si des ingrédients existent dans la base de
+- `HTTP 200 OK` Si des ingrédients existent dans la base de données
 - `HTTP 404 Not Found` Et une liste vide.
 
 
@@ -78,8 +107,13 @@ Exemple de retours :
 "Sauce tomate"
 ```
 
+Paramètres :
+- `{id}` : L'ID de l'ingrédient à modifier
+- `{attribut}` : Liste des attributs possibles :
+    - `id`, `nom`, `prix`
+
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` si des ingrédients existent dans la base de
+- `HTTP 200 OK` si des ingrédients existent dans la base de données
 - `HTTP 404 Not Found` et une liste vide.
 
 ## Requêtes PATCH
@@ -99,10 +133,10 @@ Body de la rêquete
 
 Cette requête renvoie un statut de réponse : 
 - `HTTP 200 OK` : Change l'attribut spécifié
-- `HTTP 404 Not Found` : L'ingredient est introuvable
+- `HTTP 404 Not Found` : L'ingrédient est introuvable
 - `HTTP 400 Bad Request` : Attribut inconnu
 
-Exemple d'attribute :
+Exemple d'attributs :
 - `name` : Au format d'une chaîne de caractères
 - `price` : Au format d'un nombre à virgule
 
@@ -133,6 +167,9 @@ Cette requête renvoie un statut de réponse :
 ```bash
 DELETE /ingredients/{id}
 ```
+
+Paramètres :
+- `{id}` : L'ID de la pizza
 
 Cette requête renvoie un statut de réponse : 
 - `HTTP 200 OK` : Supprime l'ingrédient en fonction de l'ID

@@ -4,27 +4,89 @@
 
 Cette documentation décrit les différentes requêtes que l'on peut effectuer vers notre API Pizza, ainsi que les réponses attendues.
 
-| URI                     | Opération     |     Requête     | Réponse                   | Code de retour                           |
-|:------------------------|:---------:    |:---------------:|:--------------------------|------------------------------------------|
-| /pizza                  |`GET`          |                 |Liste des pizzas           |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pizza/{id}             |`GET`          |                 |Une pizza                  |`HTTP 200 OK`, `HTTP 404 Not Found`       |   
-| /pizza/{id}/{attribut}  |`GET`          |                 |L'attribut de la pizza     |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pizza                  |`POST`         | Pizza           |                           |`HTTP 201 Created`, `HTTP 400 Bad Request`|
-| /pizza/{id}/{attribut}  |`POST`         | Pizza           |                           |`HTTP 201 Created`, `HTTP 400 Bad Request`, `HTTP 404 Not Found`|
-| /pizza/{id}             |`DELETE`       |                 |                           |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pizza/{id}/{attribut}  |`DELETE`       |                 |                           |`HTTP 200 OK`, `HTTP 404 Not Found`,  `HTTP 404 Not Found`|
-| /pizza                  |`PATCH`        | Pizza           |                           |`HTTP 200 OK`, `HTTP 404 Not Found`, `HTTP 400 Bad Request`|
+| URI                     |   Opération    |  Requête   | Réponse                | Code de retour                                                   |
+|:------------------------|:--------------:|:----------:|:-----------------------|------------------------------------------------------------------|
+| /pizza                  |     `GET`      |            | Liste des pizzas (P1)  | `HTTP 200 OK`, `HTTP 404 Not Found`                              |
+| /pizza/{id}             |     `GET`      |            | Une pizza (P1)         | `HTTP 200 OK`, `HTTP 404 Not Found`                              |   
+| /pizza/{id}/{attribute} |     `GET`      |            | L'attribut de la pizza | `HTTP 200 OK`, `HTTP 404 Not Found`                              |
+| /pizza                  |     `POST`     | Pizza (P2) |                        | `HTTP 201 Created`, `HTTP 400 Bad Request`                       |
+| /pizza/{id}/{attribute} |     `POST`     | Pizza (P2) |                        | `HTTP 201 Created`, `HTTP 400 Bad Request`, `HTTP 404 Not Found` |
+| /pizza/{id}             |    `DELETE`    |            |                        | `HTTP 200 OK`, `HTTP 404 Not Found`                              |
+| /pizza/{id}/{attribute} |    `DELETE`    |            |                        | `HTTP 200 OK`, `HTTP 404 Not Found`,  `HTTP 404 Not Found`       |
+| /pizza                  |    `PATCH`     | Pizza (P2) |                        | `HTTP 200 OK`, `HTTP 404 Not Found`, `HTTP 400 Bad Request`      |
 
 ## Méthodes d'appel
 
-La classe `PizzaAPI` étend la classe abstraite `API` et définit six méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
+La classe `PizzaAPI` étend la classe abstraite `API` et définit quatres méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
+
+## Corps des requêtes
+
+### P1
+
+Une pizza est constituée d'un identifiant, d'un nom, d'un type de pâte, d'un prix final et d'une liste d'ingrédients.
+
+Voici sa représentation JSON :
+
+```JSON
+{
+  "id": 1,
+  "name": "Margherita",
+  "pate": {
+    "id": 1,
+    "name": "Classique"
+  },
+  "price": 8.99,
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "Sauce tomate",
+      "price": 1.5
+    },
+    {
+      "id": 2,
+      "name": "Mozzarella",
+      "price": 2
+    }
+  ],
+"finalPrice": 12.49
+}
+```
+
+### P2
+
+Pour la création d'une pizza, on a besoin de son nom, de son type de pâte et de ses ingrédients car l'id et le prix final sont générés automatiquement.
+
+Voici sa représentation JSON :
+```JSON
+{
+  "name": "Margherita",
+  "pate": {
+    "id": 1,
+    "name": "Classique"
+  },
+  "price": 8.99,
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "Sauce tomate",
+      "price": 1.5
+    },
+    {
+      "id": 2,
+      "name": "Mozzarella",
+      "price": 2
+    }
+  ]
+}
+```
+
 
 ## Requêtes GET
 
 ### Obtenir toutes les pizzas
 
 ```bash
-GET /pizza
+GET /pizzas
 ```
 
 Exemple de retour : 
@@ -98,7 +160,7 @@ Exemple de retour :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` : Retourne les pizza dans le corps de la réponse.
+- `HTTP 200 OK` : Retourne les pizzas dans le corps de la réponse.
 - `HTTP 404 Not Found` : Aucune pizza n'a été trouvée dans la base de données.
 
 ### Obtenir une pizza par son ID
@@ -140,7 +202,7 @@ Cette requête renvoie un statut de réponse :
 ### Obtenir un attribut de pizza par son ID
 
 ```bash
-GET /pizza/{id}/{attribut}
+GET /pizza/{id}/{attribute}
 ```
 
 Exemple de retour : 
@@ -213,7 +275,7 @@ Exemple de body :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 201 Created` : La nouvelle pizza a été sauvegarde dans la base de données et un ID lui est attribué.
+- `HTTP 201 Created` : La nouvelle pizza a été sauvegardée dans la base de données et un ID lui est attribué.
 - `HTTP 400 Bad Request` : Erreur lors de la sauvegarde de la nouvelle pizza.
 
 ### Ajouter un nouvel ingrédient a une pizza
@@ -227,14 +289,14 @@ Paramètres :
 - `{idIngredient}` : L'ID de l'ingrédient à ajouter
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 201 Created` : La nouvelle pizza a été sauvegarde dans la base de données et un ID lui est attribué.
+- `HTTP 201 Created` : La nouvelle pizza a été sauvegardée dans la base de données et un ID lui est attribué.
 - `HTTP 400 Bad Request` : Erreur lors de la sauvegarde de la nouvelle pizza.
 - `HTTP 404 Not Found` : Aucune pizza ayant cet ID n'a été trouvée dans la base de données.
 
 ## Requêtes PATCH
 
 ```bash
-PATCH /pates/{id}
+PATCH /pizzas/{id}
 ```
 
 Paramètres :

@@ -1,25 +1,52 @@
 [<- Retour](./../README.md)
 
-# Documentation de l'API Pate
+# Documentation de l'API Pâte
 
-Cette documentation décrit les différentes requêtes possibles pour interagir avec notre API dédiée aux pates, ainsi que les retours attendus pour chaque demande.
+Cette documentation décrit les différentes requêtes possibles pour interagir avec notre API dédiée aux pâtes, ainsi que les retours attendus pour chaque demande.
 
-| URI                     | Opération     |     Requête     | Réponse                   | Code de retour                           |
-|:------------------------|:---------:    |:---------------:|:--------------------------|------------------------------------------|
-| /pates                  |`GET`          |                 |Liste des pates            |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pates/{id}             |`GET`          |                 |Une pâte                   |`HTTP 200 OK`, `HTTP 404 Not Found`       |   
-| /pates/{id}/{attribut}  |`GET`          |                 |L'attribut de la pâte     |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pates                  |`POST`         | Pate            |                           |`HTTP 201 Created`, `HTTP 400 Bad Request`|
-| /pates/{id}             |`DELETE`       |                 |                           |`HTTP 200 OK`, `HTTP 404 Not Found`       |
-| /pates                  |`PATCH`        | Pate            |                           |`HTTP 200 OK`, `HTTP 404 Not Found`, `HTTP 400 Bad Request`|
+| URI                     | Opération     |  Requête   | Réponse               | Code de retour                                               |
+|:------------------------|:---------:    |:----------:|:----------------------|--------------------------------------------------------------|
+| /pates                  |`GET`          |            | Liste des pâtes (P1)  | `HTTP 200 OK`, `HTTP 404 Not Found`                          |
+| /pates/{id}             |`GET`          |            | Une pâte (P1)         | `HTTP 200 OK`, `HTTP 404 Not Found`                          |   
+| /pates/{id}/{attribute} |`GET`          |            | L'attribut de la pâte | `HTTP 200 OK`, `HTTP 404 Not Found`                          |
+| /pates                  |`POST`         | Pâte (P2)  |                       | `HTTP 201 Created`, `HTTP 400 Bad Request`                   |
+| /pates/{id}             |`DELETE`       |            |                       | `HTTP 200 OK`, `HTTP 404 Not Found`                          |
+| /pates                  |`PATCH`        | Pâte  (P2) |                       | `HTTP 200 OK`, `HTTP 404 Not Found`, `HTTP 400 Bad Request`  |
 
 ## Méthodes d'appel
 
-La classe `IngredientAPI` étend la classe abstraite `API` et définit six méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
+La classe `IngredientAPI` étend la classe abstraite `API` et définit quatres méthodes `doGet`, `doPatch`, `doPost`, `doDelete` et un constructeur par défaut. Ces méthodes correspondent aux méthodes HTTP GET, PATCH, POST et DELETE respectivement.
 
 ## Requêtes GET
 
-### Obtenir toutes les pates
+## Corps des requêtes
+
+### P1
+
+Une pâte est constituée d'un identifiant et d'un nom.
+
+Voici sa représentation JSON :
+
+```JSON
+{
+  "id": 1,
+  "name": "Classique"
+}
+```
+
+### P2
+
+Pour la création d'une pâte, on a juste besoin de son nom car l'id est généré automatiquement.
+
+Voici sa représentation JSON :
+```JSON
+{
+  "name": "Classique"
+}
+```
+
+
+### Obtenir toutes les pâtes
 
 ```bash
 GET /pates
@@ -40,26 +67,26 @@ Exemple de retour :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` : Retourne une liste de pates dans le corps de la réponse, au format JSON.
-- `HTTP 404 Not Found` : Aucune pate n'a été trouvée dans la base de données.
+- `HTTP 200 OK` : Retourne une liste de pâtes dans le corps de la réponse, au format JSON.
+- `HTTP 404 Not Found` : Aucune pâte n'a été trouvée dans la base de données.
 
-### Obtenir une pate spécifique par son ID
+### Obtenir une pâte spécifique par son ID
 
 ```bash
-GET /pates/<id>
+GET /pates/{id}
 ```
 
 Paramètres :
 - `{id}` : L'ID de la pâte à récupérer
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 200 OK` : Retourne une pate au format JSON dans le corps de la réponse.
+- `HTTP 200 OK` : Retourne une pâte au format JSON dans le corps de la réponse.
 - `HTTP 404 Not Found` : Aucune pâte ayant cet ID n'a été trouvée dans la base de données.
 
 ### Obtenir un attribut de pâte par son ID
 
 ```bash
-GET /pates/{id}/{attribut}
+GET /pates/{id}/{attribute}
 ```
 
 Exemple de retour : 
@@ -69,7 +96,8 @@ Exemple de retour :
 
 Paramètres :
 - `{id}` : L'ID de la pâte à modifier
-- `{attribut}` : Liste des attributs possibles
+- `{attribut}` : Liste des attributs possibles :
+  - `id`, `nom`
 
 
 Cette requête renvoie un statut de réponse : 
@@ -93,7 +121,7 @@ Exemple de body :
 ```
 
 Cette requête renvoie un statut de réponse : 
-- `HTTP 201 Created` : La nouvelle pâte a été sauvegarde dans la base de données et un ID lui est attribué.
+- `HTTP 201 Created` : La nouvelle pâte a été sauvegardée dans la base de données et un ID lui est attribué.
 - `HTTP 400 Bad Request` : Erreur lors de la sauvegarde de la nouvelle pâte.
 
 ## Requêtes PATCH
@@ -112,11 +140,11 @@ Exemple de body :
 }
 ```
 
-> Attention le nom d'une pâte doit être unique . !
+> Attention le nom d'une pâte doit être unique !
 
 Cette requête renvoie un statut de réponse : 
 - `HTTP 200 OK` : La pâte a été mise à jour dans la base de données et un ID lui reste inchangé.
-- `HTTP 400 Bad Request` : Erreur lors de la mise à jour de la pâte, Par exemple une pate portant le même nom existe déjà.
+- `HTTP 400 Bad Request` : Erreur lors de la mise à jour de la pâte, Par exemple une pâte portant le même nom existe déjà.
 - `HTTP 404 Not Found` : Aucune pâte ayant cet ID n'a été trouvée dans la base de données.
 
 ## Requêtes DELETE
